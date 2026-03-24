@@ -1,0 +1,17 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "crons": [
+    {
+      "path": "/api/cron/generate-daily",
+      "schedule": "0 23 * * *"
+    },
+    {
+      "path": "/api/cron/trial-expiry-reminder",
+      "schedule": "0 0 * * *"
+    },
+    {
+      "path": "/api/cron/expire-past-due",
+      "schedule": "0 1 * * *"
+    }
+  ]
+}

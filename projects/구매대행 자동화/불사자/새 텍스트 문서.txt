@@ -1,0 +1,5 @@
+프로그램
+
+대상 -- C:\Users\lian1\AppData\Local\Programs\bulsaja\BULSAJA.exe
+
+시작위치 - C:\Users\lian1\AppData\Local\Programs\bulsaja

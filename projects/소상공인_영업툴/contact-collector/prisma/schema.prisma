@@ -1,0 +1,93 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// 내부 사용자 (단일 조직, Phase 1)
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  createdAt    DateTime @default(now())
+  jobs         Job[]
+}
+
+// 수집 작업
+model Job {
+  id            String     @id @default(cuid())
+  name          String
+  keyword       String
+  region        String?
+  limitCount    Int        @default(100)
+  platforms     String     @default("[]")
+  status        String     @default("PENDING")
+  totalRaw      Int        @default(0)
+  filteredCount Int        @default(0)
+  validCount    Int        @default(0)
+  errorMessage  String?
+  createdAt     DateTime   @default(now())
+  startedAt     DateTime?
+  completedAt   DateTime?
+  userId        String
+  user          User       @relation(fields: [userId], references: [id])
+  results       Contact[]
+  errors        JobError[]
+  platformStats PlatformStat[]
+
+  @@index([status])
+  @@index([userId, createdAt(sort: Desc)])
+}
+
+// 플랫폼별 수집 통계
+model PlatformStat {
+  id          String   @id @default(cuid())
+  jobId       String
+  job         Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  platform    String
+  status      String   // SUCCESS, RUNNING, FAILED
+  collected   Int      @default(0)
+  error       String?
+  createdAt   DateTime @default(now())
+
+  @@index([jobId])
+}
+
+// 수집된 연락처
+model Contact {
+  id          String    @id @default(cuid())
+  jobId       String
+  job         Job       @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  bizName     String
+  category    String?
+  phone       String?
+  kakao       String?
+  email       String?
+  sources     String     @default("[]")
+  rawSources  String     @default("[]")
+  collectedAt DateTime  @default(now())
+
+  @@index([jobId])
+  @@index([phone])
+  @@index([email])
+}
+
+// 작업별 오류 로그
+model JobError {
+  id         String   @id @default(cuid())
+  jobId      String
+  job        Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  platform   String
+  message    String
+  stack      String?
+  occurredAt DateTime @default(now())
+
+  @@index([jobId])
+}

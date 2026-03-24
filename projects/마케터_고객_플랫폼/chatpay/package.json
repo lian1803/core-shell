@@ -1,0 +1,14 @@
+{
+  "name": "chatpay",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"pnpm --filter @chatpay/api dev\" \"pnpm --filter @chatpay/web dev\"",
+    "build": "pnpm --filter @chatpay/api build && pnpm --filter @chatpay/web build && pnpm --filter @chatpay/widget build",
+    "db:migrate": "pnpm --filter @chatpay/api db:migrate",
+    "db:generate": "pnpm --filter @chatpay/api db:generate"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.0"
+  }
+}

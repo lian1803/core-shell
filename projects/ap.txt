@@ -1,0 +1,47 @@
+메타
+
+앱id
+4358019994477072
+
+앱시크릿
+c794253c1c81a0024f16997db6c9ac87
+
+
+Threads 앱 ID
+1508840024069300
+
+
+Threads 앱 시크릿 코드
+79a48ff4638a1ba4398f409cf8bf9b06
+
+Threads 표시 이름
+liancp
+
+
+
+---------------------------------------------
+깃허브
+
+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
+
+---------------------------------------------
+버셀
+
+vcp_1aUuyW1gbFxyvX18JmdF5svUGJWSqw2lrEzR386D0A7vyanMJN3rOBpp
+
+
+---------------------------------------------
+수파베이스
+
+비번- gksfldks13*
+
+Publishable key-sb_publishable_D4pnTEDc5x-H4cPGX4HpLw_ti3gEtxZ
+Secret keys-sb_secret_-Jhp4uWASRjPXjS-Qz2VfQ_5njuyEjU
+anon-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN3b2t0eGp6c2hoamZmYWtteWFiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5NTU2ODQsImV4cCI6MjA4OTUzMTY4NH0.KLCXKxB5EIA6vCWCOqpwm4a_ZTkXowgLrFhcNIZ4PyA
+service_role-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN3b2t0eGp6c2hoamZmYWtteWFiIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3Mzk1NTY4NCwiZXhwIjoyMDg5NTMxNjg0fQ.7IcQ61R2zkhhNMuwAkqU4jtcJQDfMUA3lU484y3fZpg
+
+----------------------------------------------
+네이버
+
+liandlfqhs13
+Gksfldks13**

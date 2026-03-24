@@ -1,0 +1,17 @@
+{
+  "name": "@chatpay/widget",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "esbuild src/index.ts --bundle --minify --outfile=dist/widget.js --platform=browser --target=es2018",
+    "dev": "esbuild src/index.ts --bundle --outfile=dist/widget.js --platform=browser --target=es2018 --watch"
+  },
+  "dependencies": {
+    "socket.io-client": "^4.7.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "esbuild": "^0.21.0",
+    "typescript": "^5.4.0"
+  }
+}

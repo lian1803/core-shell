@@ -1,0 +1,22 @@
+{
+  "name": "contact-collector",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"pnpm --filter web dev\" \"pnpm --filter worker dev\"",
+    "build": "pnpm --filter web build && pnpm --filter worker build",
+    "db:push": "pnpm --filter web db:push",
+    "db:seed": "pnpm --filter web db:seed",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down"
+  },
+  "devDependencies": {
+    "@prisma/client": "^5.11.0",
+    "concurrently": "^8.2.2",
+    "prisma": "^5.11.0",
+    "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "better-sqlite3": "^12.8.0"
+  }
+}

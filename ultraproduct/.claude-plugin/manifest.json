@@ -1,0 +1,23 @@
+{
+  "name": "ultraproduct",
+  "version": "1.0.0",
+  "description": "설계서(CLAUDE.md) → 코드 + 마케팅 + 배포 자동 실행 엔진",
+  "commands": [
+    {
+      "name": "work",
+      "description": "CLAUDE.md 읽고 프로젝트 유형 판단 → Wave 1~6 자동 실행. 명령어 하나로 풀스택 완성.",
+      "file": "commands/work.md"
+    }
+  ],
+  "agents": [
+    "agents/cpo.md",
+    "agents/cto.md",
+    "agents/cdo.md",
+    "agents/pm.md",
+    "agents/fe.md",
+    "agents/be.md",
+    "agents/qa.md",
+    "agents/marketing.md",
+    "agents/analytics.md"
+  ]
+}
