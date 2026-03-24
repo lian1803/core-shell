@@ -23,11 +23,14 @@
 - **스택**: Node.js / Fastify / Next.js / Socket.io / PostgreSQL / Redis / Supabase
 - **상태**: 코드 있음
 
-### 2. 소상공인 영업툴 (네이버 진단 + 연락처 수집 통합)
+### 2. 소상공인 영업툴 (지역 수집 + 네이버 진단 + 연락처 수집 통합)
 - **폴더**: `projects/소상공인_영업툴/`
-- **서브**: `naver-diagnosis/` (플레이스 진단+PPT) + `contact-collector/` (연락처 수집)
-- **뭐하는 거**: 네이버 플레이스 진단 PPT 제안서 + 소상공인 실연락처 수집 자동화
-- **스택**: FastAPI / Python + Node.js / Next.js / Playwright / BullMQ
+- **서브**:
+  - `영업타겟-수집/` — 지역 업체 수집 → 네이버 플레이스 검증 → Excel (main.py, main_v2.py)
+  - `naver-diagnosis/` — 네이버 플레이스 진단 + PPT 제안서 생성
+  - `contact-collector/` — 소상공인 실연락처 자동 수집
+- **풀 파이프라인**: 지역 업체 수집 → 네이버 검증 → 플레이스 진단 → PPT
+- **스택**: Python / FastAPI / Playwright + Node.js / Next.js / BullMQ
 - **상태**: 코드 있음
 
 ### 4. 소상공인 인스타그램 자동화

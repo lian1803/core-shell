@@ -158,6 +158,7 @@ def _extract_instagram_from_html(html: str) -> str:
 async def get_place_detail(search_page, photo_page, name: str, address: str) -> Dict:
     detail = {
         "place_id": None, "naver_url": "",
+        "telephone": "",
         "photo_count": 0, "visitor_review": 0, "receipt_review": 0, "blog_review": 0,
         "has_hours": False, "has_menu": False, "has_navertalk": False,
         "instagram_url": "",
@@ -176,6 +177,19 @@ async def get_place_detail(search_page, photo_page, name: str, address: str) -> 
         html = await search_page.content()
 
         pid = _extract_place_id(html)
+
+        # fallback: 업체명만으로 재검색
+        if not pid:
+            await search_page.goto(
+                f"https://m.search.naver.com/search.naver?query={urllib.parse.quote(name)}&where=m_local",
+                timeout=20000
+            )
+            await search_page.wait_for_load_state("networkidle", timeout=15000)
+            await search_page.wait_for_timeout(1000)
+            html = await search_page.content()
+            text = await search_page.inner_text("body")
+            pid = _extract_place_id(html)
+
         if pid:
             detail["place_id"] = pid
             detail["naver_url"] = f"https://map.naver.com/p/entry/place/{pid}"
@@ -184,6 +198,11 @@ async def get_place_detail(search_page, photo_page, name: str, address: str) -> 
         detail["has_hours"]     = bool(re.search(r'영업시간|운영시간', text))
         detail["has_menu"]      = bool(re.search(r'메뉴\s*\d+|메뉴판', text))
         detail["has_navertalk"] = "톡톡" in text or "talk.naver" in html
+
+        # 전화번호 추출 (API가 안 줄 때 페이지 텍스트에서)
+        phone_match = PHONE_PATTERN.search(text)
+        if phone_match:
+            detail["telephone"] = phone_match.group(0)
 
         # 인스타그램 URL 추출 (플레이스 페이지에서 직접)
         ig = _extract_instagram_from_html(html)
