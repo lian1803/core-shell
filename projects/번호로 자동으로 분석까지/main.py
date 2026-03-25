@@ -119,7 +119,6 @@ async def main():
     print(f"\n총 {len(businesses)}개 업체 발견. 처리 시작...\n")
 
     # Playwright 브라우저 시작
-    from playwright.async_api import async_playwright
     playwright = await async_playwright().start()
     browser = await playwright.chromium.launch(headless=True)
 
