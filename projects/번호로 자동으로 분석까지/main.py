@@ -116,7 +116,15 @@ async def main():
         print("엑셀에서 네이버 플레이스 URL을 찾을 수 없습니다.")
         return
 
-    print(f"\n총 {len(businesses)}개 업체 발견. 처리 시작...\n")
+    # CRITICAL: 배치 크기 안전 제한 (네이버 IP 차단 방지)
+    MAX_BATCH = 10
+    if len(businesses) > MAX_BATCH:
+        print(f"\n⚠️  [경고] 한 번에 {MAX_BATCH}개 초과 시 네이버 IP 차단 위험!")
+        print(f"   요청: {len(businesses)}개 → 앞 {MAX_BATCH}개만 처리합니다.")
+        print(f"   나머지 {len(businesses) - MAX_BATCH}개는 나중에 따로 실행하세요.\n")
+        businesses = businesses[:MAX_BATCH]
+
+    print(f"\n총 {len(businesses)}개 업체 처리 시작...\n")
 
     # Playwright 브라우저 시작
     playwright = await async_playwright().start()
