@@ -81,6 +81,12 @@ async def process_one(row_data: dict, browser) -> str:
     if competitors:
         score_result = calc_relative(score_result, competitors)
 
+    # 기회비용 계산 (잃고 있는 월 예상 방문자 수)
+    monthly_searches = keyword_stats.get("mobile", 0)
+    lost_customers = calc_lost_customers(rank, monthly_searches)
+    if lost_customers > 0:
+        log("Main", f"  기회비용: 매달 약 {lost_customers:,}명 손실 추정 (순위={rank}위, 월검색={monthly_searches:,})")
+
     # Step 7: PPT 생성
     log("Main", "Step 7: PPT 생성...")
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -99,6 +105,7 @@ async def process_one(row_data: dict, browser) -> str:
         score_result=score_result,
         competitors=competitors,
         screenshot_path=screenshot_path,
+        lost_customers=lost_customers,
     )
 
     return output_path
