@@ -57,9 +57,23 @@ def read_first_url_row(path: str) -> Optional[Dict]:
 
     for row in ws.iter_rows(min_row=2, values_only=True):
         row_dict = dict(zip(headers, row))
-        url = str(row_dict.get("네이버플레이스", "") or "")
-        if url.startswith("http") and "place" in url:
-            print(f"[Excel] 발견: {row_dict.get('업체명')} | URL: {url[:60]}...")
+        # 모든 컬럼에서 네이버 URL 탐색
+        url = ""
+        for col_name in ["네이버플레이스", "주소", "플레이스주소", "url", "URL"]:
+            val = str(row_dict.get(col_name, "") or "")
+            if val.startswith("http") and "naver" in val:
+                url = val
+                break
+        # 컬럼명 상관없이 값에서 URL 탐색
+        if not url:
+            for val in row_dict.values():
+                val_str = str(val or "")
+                if val_str.startswith("http") and "naver" in val_str:
+                    url = val_str
+                    break
+        if url and "place" in url:
+            row_dict["_place_url"] = url
+            print(f"[Excel] 발견: {row_dict.get('업체명')} | URL: {url[:70]}...")
             return row_dict
     return None
 
