@@ -111,10 +111,6 @@ def _build_slide_score(slide, score_result, business_name: str):
     for shape in slide.shapes:
         _replace_in_shape(shape, replacements)
 
-    # 점수 큰 숫자 텍스트박스 추가
-    W = slide.shapes._spTree.getparent().presentation.slide_width
-    H = slide.shapes._spTree.getparent().presentation.slide_height
-
     # 중앙 상단에 등급 박스
     _add_textbox(
         slide, f"{grade}",
