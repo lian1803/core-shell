@@ -564,6 +564,14 @@ def generate_ppt(
         slide_count = len(prs.slides)
         log("PPT", f"템플릿 슬라이드 수: {slide_count}")
 
+        # 먼저 전체 PPT에서 공통 플레이스홀더 일괄 교체
+        global_replacements = {
+            "(업체명)": business_name,
+            "업체명": business_name,
+        }
+        replace_all_text(prs, global_replacements)
+        log("PPT", f"전체 슬라이드에서 플레이스홀더 교체 완료: {business_name}")
+
         related = keyword_stats.get("related", [])
         # 연관 키워드 부족 시 place 키워드로 보완
         if len(related) < 4 and getattr(place_data, 'keywords', []):
