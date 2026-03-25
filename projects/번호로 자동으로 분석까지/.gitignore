@@ -1,6 +1,0 @@
-.env
-__pycache__/
-*.pyc
-output/
-*.pptx
-!샘플/*.pptx
