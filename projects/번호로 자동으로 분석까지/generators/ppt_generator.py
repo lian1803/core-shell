@@ -512,24 +512,88 @@ def _build_slide_weak_points(slide, score_result, place_data, comp_avg: Dict):
 
 
 def _build_slide_package(slide, business_name: str):
-    """슬라이드 9: 패키지 소개 (고정 콘텐츠 + 업체명)"""
+    """슬라이드 9: 패키지 소개"""
     replacements = {"(업체명)": business_name, "업체명": business_name}
     for shape in slide.shapes:
         _replace_in_shape(shape, replacements)
+
+    # 슬라이드가 비어있으면 패키지 콘텐츠 직접 생성
+    has_content = any(
+        shape.has_text_frame and any(p.text.strip() for p in shape.text_frame.paragraphs)
+        for shape in slide.shapes
+    )
+    if not has_content:
+        _add_textbox(slide, "서비스 패키지", Inches(0.5), Inches(0.2),
+                     Inches(9), Inches(0.7), font_size=28, bold=True, color=COLOR["DARK"])
+        _add_textbox(slide, f"[ {business_name} ] 맞춤 플레이스 최적화 플랜",
+                     Inches(0.5), Inches(0.95), Inches(9), Inches(0.45),
+                     font_size=13, color=COLOR["NEUTRAL"])
+
+        pkgs = [
+            ("주목 패키지  290,000원/월",
+             "• 기본 정보 전체 최적화  • 키워드 3개 등록\n"
+             "• 사진 정리 및 순서 최적화  • 월 1회 리포트 제공"),
+            ("집중 패키지  490,000원/월",
+             "• 주목 패키지 전체 포함  • 전문 사진 촬영 10장\n"
+             "• 블로그 리뷰 5건 관리  • 사장님 답글 대행"),
+            ("시선 패키지  890,000원/월",
+             "• 집중 패키지 전체 포함  • 인스타그램 연동 관리\n"
+             "• 월 2회 새소식/이벤트 게시  • 전담 매니저 배정"),
+        ]
+        y = Inches(1.5)
+        for title, detail in pkgs:
+            _add_textbox(slide, title, Inches(0.5), y, Inches(9), Inches(0.5),
+                         font_size=16, bold=True, color=COLOR["PRIMARY"])
+            _add_textbox(slide, detail, Inches(0.9), y + Inches(0.52), Inches(8), Inches(0.75),
+                         font_size=12, color=COLOR["DARK"])
+            y += Inches(1.55)
 
 
 def _build_slide_package_detail(slide, business_name: str):
-    """슬라이드 10: 패키지 상세"""
+    """슬라이드 10: 패키지 도입 근거"""
     replacements = {"(업체명)": business_name, "업체명": business_name}
     for shape in slide.shapes:
         _replace_in_shape(shape, replacements)
 
+    has_content = any(
+        shape.has_text_frame and any(p.text.strip() for p in shape.text_frame.paragraphs)
+        for shape in slide.shapes
+    )
+    if not has_content:
+        _add_textbox(slide, "왜 네이버 플레이스 최적화인가?",
+                     Inches(0.5), Inches(0.2), Inches(9), Inches(0.7),
+                     font_size=26, bold=True, color=COLOR["DARK"])
 
-def _build_slide_estimate(slide, business_name: str, grade: str):
-    """슬라이드 11: 견적서"""
+        points = [
+            ("01", "네이버 지도 검색 = 구매 의도가 가장 높은 고객",
+             "검색하는 사람 10명 중 7명은 '오늘 방문' 또는 '바로 구매' 의사가 있습니다."),
+            ("02", "상위 3위 이내 노출 시 클릭률 35% 이상",
+             "4위 이하로 떨어지는 순간 클릭률이 절반 이하로 감소합니다."),
+            ("03", "광고비 없는 자연 유입 채널",
+             "한 번 최적화된 플레이스는 지속적으로 고객을 유입시킵니다."),
+            ("04", "경쟁사는 이미 시작했습니다",
+             "상위 업체들은 대부분 전문 관리 중입니다. 지금이 마지막 기회입니다."),
+        ]
+        y = Inches(1.1)
+        for num, title, desc in points:
+            _add_textbox(slide, num, Inches(0.3), y, Inches(0.7), Inches(0.45),
+                         font_size=20, bold=True, color=COLOR["PRIMARY"])
+            _add_textbox(slide, title, Inches(1.1), y, Inches(8.3), Inches(0.42),
+                         font_size=14, bold=True, color=COLOR["DARK"])
+            _add_textbox(slide, desc, Inches(1.1), y + Inches(0.44), Inches(8.3), Inches(0.38),
+                         font_size=11, color=COLOR["NEUTRAL"])
+            y += Inches(1.1)
+
+
+def _build_slide_estimate(slide, business_name: str, grade: str, lost_customers: int = 0):
+    """슬라이드 11: 견적서 + 기회비용 요약"""
     pkg_map = {"S": "시선 패키지", "A": "집중 패키지", "B": "집중 패키지",
                "C": "주목 패키지", "D": "주목 패키지", "F": "주목 패키지"}
+    price_map = {"시선 패키지": "890,000원/월", "집중 패키지": "490,000원/월",
+                 "주목 패키지": "290,000원/월"}
     pkg = pkg_map.get(grade, "주목 패키지")
+    price = price_map[pkg]
+
     replacements = {
         "(업체명)": business_name,
         "업체명": business_name,
@@ -539,13 +603,58 @@ def _build_slide_estimate(slide, business_name: str, grade: str):
     for shape in slide.shapes:
         _replace_in_shape(shape, replacements)
 
-    # 추천 패키지 강조 텍스트박스
+    has_content = any(
+        shape.has_text_frame and any(p.text.strip() for p in shape.text_frame.paragraphs)
+        for shape in slide.shapes
+    )
+    if not has_content:
+        _add_textbox(slide, "맞춤 제안서",
+                     Inches(0.5), Inches(0.2), Inches(9), Inches(0.65),
+                     font_size=28, bold=True, color=COLOR["DARK"])
+        _add_textbox(slide, f"[ {business_name} ] 전용 제안",
+                     Inches(0.5), Inches(0.9), Inches(9), Inches(0.4),
+                     font_size=13, color=COLOR["NEUTRAL"])
+
+        # 추천 패키지 박스
+        _add_textbox(slide, f"추천 패키지: {pkg}",
+                     Inches(0.5), Inches(1.45), Inches(6), Inches(0.65),
+                     font_size=22, bold=True, color=COLOR["WHITE"],
+                     bg_color=COLOR["PRIMARY"])
+        _add_textbox(slide, price,
+                     Inches(6.7), Inches(1.52), Inches(2.7), Inches(0.52),
+                     font_size=18, bold=True, color=COLOR["PRIMARY"])
+
+        # 기회비용 계산
+        if lost_customers > 0:
+            _add_textbox(
+                slide,
+                f"지금 계약하지 않으면,\n매달 약 {lost_customers:,}명의 잠재 고객이 경쟁사로 갑니다.",
+                Inches(0.5), Inches(2.25), Inches(9), Inches(0.9),
+                font_size=14, bold=True, color=COLOR["BAD"],
+            )
+            y_after = Inches(3.3)
+        else:
+            y_after = Inches(2.35)
+
+        # 서비스 포함 내역
+        _add_textbox(slide, "포함 서비스", Inches(0.5), y_after, Inches(9), Inches(0.42),
+                     font_size=14, bold=True, color=COLOR["DARK"])
+        include_map = {
+            "시선 패키지": "기본정보 최적화 / 사진 촬영 10장 / 블로그 리뷰 5건 / 인스타그램 관리 / 월 2회 새소식 / 전담 매니저",
+            "집중 패키지": "기본정보 최적화 / 사진 촬영 10장 / 블로그 리뷰 5건 / 사장님 답글 대행 / 월 1회 리포트",
+            "주목 패키지": "기본정보 최적화 / 키워드 3개 등록 / 사진 정리 / 월 1회 리포트",
+        }
+        _add_textbox(slide, include_map[pkg],
+                     Inches(0.7), y_after + Inches(0.45), Inches(8.5), Inches(0.5),
+                     font_size=12, color=COLOR["DARK"])
+
+    # 기존 템플릿이 있는 경우도 추천 패키지 강조 추가
     _add_textbox(
         slide,
-        f"[ {business_name} ] 추천 패키지: {pkg}",
-        left=Inches(0.5), top=Inches(5.5),
-        width=Inches(9), height=Inches(0.6),
-        font_size=14, bold=True,
+        f"[ {business_name} ] 추천: {pkg}  ({price})",
+        left=Inches(0.5), top=Inches(6.8),
+        width=Inches(9), height=Inches(0.5),
+        font_size=13, bold=True,
         color=COLOR["PRIMARY"],
     )
 
