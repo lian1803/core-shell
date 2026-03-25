@@ -14,7 +14,7 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, BASE_DIR)
 
 from config import EXCEL_PATH, TEMPLATE_PATH, OUTPUT_DIR, log
-from io.excel_reader import read_all_businesses, extract_place_id
+from file_io.excel_reader import read_all_businesses, extract_place_id
 from crawlers.place_crawler import crawl_place, capture_search_screenshot
 from crawlers.rank_crawler import get_keyword_rank
 from crawlers.competitor_crawler import get_competitors
