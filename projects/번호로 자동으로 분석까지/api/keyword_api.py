@@ -52,7 +52,10 @@ def _parse_qcnt(val) -> int:
 async def get_keyword_stats(keyword: str) -> Dict[str, Any]:
     """키워드 월간 검색량 + 연관 키워드 조회"""
     path = "/keywordstool"
-    params = {"hintKeywords": keyword, "showDetail": "1"}
+    # 네이버 광고 API는 공백 포함 키워드를 hintKeywords에서 거부함 (400 오류)
+    # 공백 제거 버전으로 조회 후 원본 키워드도 시도
+    keyword_nospace = keyword.replace(" ", "")
+    params = {"hintKeywords": keyword_nospace, "showDetail": "1"}
     headers = _make_ad_headers("GET", path)
 
     default = {"pc": 0, "mobile": 0, "total": 0, "related": []}
