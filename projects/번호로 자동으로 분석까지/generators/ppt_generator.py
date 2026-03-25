@@ -119,9 +119,9 @@ def _build_slide_score(slide, score_result, business_name: str):
         font_size=72, bold=True,
         color=COLOR["WHITE"], bg_color=grade_color,
     )
-    # 점수
+    # 점수 (실제 만점 95점)
     _add_textbox(
-        slide, f"{total} / 100점",
+        slide, f"{total} / 95점",
         left=Inches(3.2), top=Inches(1.4),
         width=Inches(3.5), height=Inches(1.0),
         font_size=40, bold=True,
