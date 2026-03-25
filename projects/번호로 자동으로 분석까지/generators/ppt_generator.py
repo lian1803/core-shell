@@ -564,6 +564,14 @@ def generate_ppt(
         slide_count = len(prs.slides)
         log("PPT", f"템플릿 슬라이드 수: {slide_count}")
 
+        # CRITICAL 검증: 예상 슬라이드 수 vs 실제 템플릿 슬라이드 수
+        expected_count = max(SLIDE_INDEX.values()) + 1  # 11
+        if slide_count < expected_count:
+            missing_slides = [name for name, idx in SLIDE_INDEX.items() if idx >= slide_count]
+            log("PPT", f"⚠️ [경고] 템플릿 슬라이드 {slide_count}장 (예상 {expected_count}장)")
+            log("PPT", f"⚠️ 누락된 슬라이드 {len(missing_slides)}개: {missing_slides}")
+            log("PPT", "   → 해당 슬라이드는 건너뜁니다. 템플릿에 슬라이드를 추가하면 생성됩니다.")
+
         # 먼저 전체 PPT에서 공통 플레이스홀더 일괄 교체
         global_replacements = {
             "(업체명)": business_name,
