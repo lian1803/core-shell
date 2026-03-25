@@ -501,6 +501,18 @@ def generate_ppt(
     related = keyword_stats.get("related", [])
     rank_str = f"{rank}위" if rank > 0 else "순위권 외"
 
+    # 의뢰 업체 정보 텍스트 구성
+    address = place_data.get("address", "")
+    phone = place_data.get("phone", "")
+    biz_info_lines = [business_name]
+    if category:
+        biz_info_lines.append(category)
+    if address:
+        biz_info_lines.append(address)
+    if phone:
+        biz_info_lines.append(phone)
+    biz_info = "\n".join(biz_info_lines)
+
     # 전체 공통 치환
     replacements = {
         "(업체명)": business_name,
@@ -509,9 +521,9 @@ def generate_ppt(
         "Pc : 80회": f"PC : {pc:,}회",
         "모바일 : 80회": f"모바일 : {mobile:,}회",
         "전체 : 80회": f"전체 : {total:,}회",
-        "플레이스 주소": place_url if place_url else "주소 없음",
+        "플레이스 주소": biz_info,
         "상호명": business_name,
-        "집중패키지": "집중패키지",  # 키워드 란의 '집중패키지' → 메인키워드로 변경
+        "집중패키지": "집중패키지",
     }
 
     # 슬라이드2의 '집중패키지' (키워드 추천 칸)는 실제 메인 키워드로
