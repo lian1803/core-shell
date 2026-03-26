@@ -4,28 +4,37 @@
 
 ---
 
-## 마지막 세션 (2026-03-26)
+## 마지막 세션 (2026-03-26 오후)
 
 **뭘 했나:**
-- 강의 자료(새 폴더/) 7개 전체 스캔 + 분석 완료
-- CDO 에이전트 업그레이드: Part 4 UX 원칙 + 비주얼 디자인 + 전환 최적화 + 채널 반영
-- 수아 마케팅 에이전트 업그레이드: 세일즈 퍼널/가치 사다리/Hook-Story-Offer/PAS 카피 주입
-- /work 플로우 수정: Wave 1에 수아 채널 사전 판단 추가 (CDO 디자인 전 실행)
-- jongbum.py 수정: CLAUDE.md에 시장 리서치(서윤/태호/하은) 데이터 포함
-- 루트 CLAUDE.md 현재 상태로 전면 업데이트
-- STATUS.md 세션 핸드오프 시스템 구축
+- 프로젝트 폴더 전체 구조 파악 및 정리
+- 010수집 관련 폴더 4개 분석 후 구버전 3개 삭제
+- `번호로 자동으로 분석까지/` (CLI 진단 초안) 삭제 — naver-diagnosis 웹앱이 최신
+- /save 슬래시 커맨드 생성
+- CLAUDE.md 자동저장 규칙 강화
+
+**삭제한 폴더:**
+- `projects/지역_소상공인_010번호_+_인스타/` (GUI 버전, 성능 낮음)
+- `projects/소상공인_영업툴/영업타겟-수집/` (구버전 Python 수집기)
+- `projects/소상공인_영업툴/contact-collector/` (Node.js 버전)
+- `projects/번호로 자동으로 분석까지/` (CLI 진단 초안)
+
+**현재 정리된 구조:**
+```
+[진행중] 오프라인 마케팅/
+├── 소상공인 010수집 최종본/   ← main_final.py (2,704건)
+└── 소상공인_영업툴/
+    └── naver-diagnosis/       ← FastAPI 웹앱 (최신)
+```
 
 **변경한 파일:**
-- `.claude/agents/cdo.md` — UX 원칙 + 비주얼 디자인 + 전환 최적화 추가
-- `.claude/agents/marketing.md` — 퍼널/PAS/Hook + Wave 1 채널 사전 판단 추가
-- `.claude/commands/work.md` — Wave 1 순서 변경 (수아→CPO+CTO→CDO)
-- `lian_company/agents/jongbum.py` — 시장 리서치 섹션 + 서윤/태호/하은 context 전달
-- `CLAUDE.md` — 전면 업데이트 (구식 정보 제거, 현재 상태 반영)
-- `STATUS.md` — 이 파일 (세션 핸드오프 구조로 재구성)
+- `CLAUDE.md` — 자동저장 규칙 강화
+- `.claude/commands/save.md` — /save 커맨드 신규 생성
+- `memory/project_010_collector.md` — 최신 위치/상태로 업데이트
 
 **다음 세션에서 이어할 것:**
+- [ ] 포천/의정부 main_final.py로 실행 (양주만 해봄)
 - [ ] lian_company/.env 생성 후 파이프라인 테스트
-- [ ] GitHub 레포 생성 → 원격 연결 → 자동 push 활성화
 - [ ] 전체 플로우 E2E 테스트: python main.py → /work 한 사이클
 
 ---
