@@ -108,18 +108,27 @@ async def run_batch(
     batch_id: str,
     business_names: List[str],
     crawl_callback,
-    delay_seconds: int = 3,
+    delay_min: int = 5,
+    delay_max: int = 10,
 ):
     """
     순차 진단 큐 실행.
+    네이버 차단 방지: 랜덤 딜레이 + 연속 실패 감지 + 자동 일시정지.
 
     Args:
         batch_id: 배치 고유 ID
         business_names: 업체명 목록
         crawl_callback: async 함수 (business_name) -> history_id or None
-        delay_seconds: 배치 간 딜레이 (기본 3초, 네이버 차단 방지)
+        delay_min: 최소 딜레이 초 (기본 5초)
+        delay_max: 최대 딜레이 초 (기본 10초)
     """
+    import random
+
     total = len(business_names)
+    consecutive_failures = 0
+    current_delay_min = delay_min
+    current_delay_max = delay_max
+
     _batch_store[batch_id].update({
         "status": "running",
         "total": total,
@@ -143,8 +152,12 @@ async def run_batch(
             })
             if history_id is not None:
                 _batch_store[batch_id]["completed"] += 1
+                consecutive_failures = 0
+                current_delay_min = delay_min
+                current_delay_max = delay_max
             else:
                 _batch_store[batch_id]["failed"] += 1
+                consecutive_failures += 1
         except Exception as e:
             print(f"[Batch] {name} 진단 오류: {e}")
             _batch_store[batch_id]["results"].append({
@@ -154,14 +167,26 @@ async def run_batch(
                 "error": str(e),
             })
             _batch_store[batch_id]["failed"] += 1
+            consecutive_failures += 1
+
+        # 연속 실패 감지 → 차단 가능성 대응
+        if consecutive_failures >= 3:
+            print(f"[Batch] 연속 {consecutive_failures}회 실패 — 60초 대기 (차단 방지)")
+            _batch_store[batch_id]["status"] = "paused_cooldown"
+            await asyncio.sleep(60)
+            _batch_store[batch_id]["status"] = "running"
+            current_delay_min = delay_min * 2
+            current_delay_max = delay_max * 2
+            consecutive_failures = 0
 
         # 진행률 업데이트
         progress = int(((idx + 1) / total) * 100)
         _batch_store[batch_id]["progress"] = progress
 
-        # 마지막 항목이 아니면 딜레이
+        # 마지막 항목이 아니면 랜덤 딜레이
         if idx < total - 1:
-            await asyncio.sleep(delay_seconds)
+            delay = random.uniform(current_delay_min, current_delay_max)
+            await asyncio.sleep(delay)
 
     if _batch_store[batch_id].get("status") == "running":
         _batch_store[batch_id]["status"] = "done"
