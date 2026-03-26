@@ -127,6 +127,7 @@ async def _crawl_callback_factory(app_state):
                     industry_type=crawl_data.get("industry_type", ""),
                     priority_tag=priority_tag,
                     competitor_avg_review=fb["avg_review"],
+                    competitor_avg_photo=fb["avg_photo"],
                     competitor_avg_blog=fb["avg_blog"],
                     estimated_lost_customers=crawl_data.get("estimated_lost_customers", 0),
                     messages=messages,
