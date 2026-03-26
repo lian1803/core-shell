@@ -6,26 +6,29 @@
 
 ## 마지막 세션 (2026-03-26 — Wave 5 마케팅 전략 완료)
 
-**뭘 했나 (2026-03-26 밤 세션):**
-소상공인 영업툴 Wave 3 CTO 통합 리뷰 + 버그 즉시 수정.
+**뭘 했나 (2026-03-26 세션):**
+소상공인 영업툴 Wave 5 마케팅 전략 + 콘텐츠 완성.
 
-**CTO 리뷰 결과: PASS (버그 6개 발견 → 즉시 수정 완료)**
+**Wave 5-1 채널 전략 (marketing/wave5_1_채널전략.md):**
+- 채널 TOP 3 선정: 네이버 블로그 (SEO 장기 자산) / 네이버 카페 (즉시 타겟 접촉) / 인스타 (신뢰 보강)
+- 채널별 타겟팅 방법 + 예상 효과 수치 명시
+- 세일즈 퍼널 4단계 (미끼→주목 29만→집중 49만→시선 89만) 설계
+- Cold/Warm/Hot 방문자 온도별 콘텐츠 전략 분리
+- 실행 우선순위 타임라인 (지금 바로 / 이번 주 / 2주 후)
 
-**발견 및 수정한 버그 (CTO 리뷰):**
-1. [치명] `main.py` result_page — messages/key_metrics/score_items 변수 누락 → 추가
-2. [치명] messages 구조 불일치 — BE 출력({first:{type,text,label}, second:str}) vs FE 기대({first:{versions}, second:{text}}) → _build_template_messages() 변환 함수 추가
-3. [치명] `history.sales_priority` 필드 없음 — 모델은 priority_tag인데 템플릿이 sales_priority 참조 → 동적 속성 변환 추가
-4. [치명] /history, /batch 페이지 라우터 누락 — 404 뜨던 것 → main.py에 페이지 라우터 추가
-5. [중간] `batch.py` BackgroundTasks 오용 — add_task(asyncio.create_task, _run()) → add_task(_run)으로 수정
-6. [중간] `crawl.py` 신규 필드 누락 — DiagnosisHistory 저장 시 industry_type/priority_tag/competitor/messages 없음 → 경쟁사 크롤링+우선순위+메시지 생성 로직 추가
+**Wave 5-2 콘텐츠 완성 (marketing/wave5_2_콘텐츠.md):**
+- 블로그 SEO 글 전문 2,000자+ (제목 A/B/C 3안, 추천 A안)
+- 네이버 카페 글 3개 (지역 소상공인 카페/맘카페/직접 타겟 스타일 각각 다름)
+- 인스타 캡션 A/B/C (Hook-Story-Offer 구조, PAS 카피) + DALL-E 이미지 프롬프트 3종
+- 해시태그 30개 (대형/중형/소형/지역/업종 분류)
+- 발행 스케줄 4주 플랜 + 성과 측정 기준
 
-**이전 QA 신규 생성 (Wave 3 FE/BE):**
-- `config/industry_weights.py`, `services/message_generator.py`, `services/competitor.py`, `services/batch_processor.py`
-- `routers/message.py`, `routers/batch.py`, `qa/test_results.md`
-- `templates/result.html`, `templates/history.html`, `templates/batch.html`
+**신규 생성 파일:**
+- `projects/[진행중] 오프라인 마케팅/소상공인_영업툴/marketing/wave5_1_채널전략.md`
+- `projects/[진행중] 오프라인 마케팅/소상공인_영업툴/marketing/wave5_2_콘텐츠.md`
 
-**이전 QA 수정:**
-- `services/scorer.py`, `services/ppt_generator.py`, `models.py`, `routers/__init__.py`, `requirements.txt`
+**이전 세션 (Wave 3 CTO 통합 리뷰):**
+CTO 리뷰 결과: PASS, 버그 6개 발견 → 즉시 수정 완료
 
 **다음 세션에서 이어할 것:**
 - [ ] **즉시 실행**: `cd naver-diagnosis && pip install openpyxl`
