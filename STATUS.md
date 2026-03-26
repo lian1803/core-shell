@@ -6,36 +6,32 @@
 
 ## 마지막 세션 (2026-03-26 저녁)
 
-**뭘 했나:**
-- 프로젝트 폴더 전체 구조 파악 및 정리
-- 010수집 관련 폴더 4개 분석 후 구버전 3개 삭제
-- `번호로 자동으로 분석까지/` (CLI 진단 초안) 삭제 — naver-diagnosis 웹앱이 최신
-- /save 슬래시 커맨드 생성
-- CLAUDE.md 자동저장 규칙 강화
+**뭘 했나 (2026-03-26 저녁 세션):**
+소상공인 영업툴 백엔드 업그레이드 전체 구현 완료.
 
-**삭제한 폴더:**
-- `projects/지역_소상공인_010번호_+_인스타/` (GUI 버전, 성능 낮음)
-- `projects/소상공인_영업툴/영업타겟-수집/` (구버전 Python 수집기)
-- `projects/소상공인_영업툴/contact-collector/` (Node.js 버전)
-- `projects/번호로 자동으로 분석까지/` (CLI 진단 초안)
+신규 생성:
+- `config/industry_weights.py` — 업종별 가중치/객단가/경쟁사폴백/패키지 정의
+- `config/__init__.py`
+- `services/message_generator.py` — 1~4차 영업 메시지 자동 생성 (A/B/C 자동 선택)
+- `services/competitor.py` — 경쟁사 경량 크롤링 + 업종별 폴백
+- `services/batch_processor.py` — xlsx 배치 처리 (openpyxl, 3초 딜레이)
+- `routers/message.py` — GET /message/{id}, POST /message/regenerate/{id}, PATCH /api/businesses/{id}/priority
+- `routers/batch.py` — POST /batch/start, GET /batch/status/{id}, POST /batch/cancel/{id}, GET /batch/list
 
-**현재 정리된 구조:**
-```
-[진행중] 오프라인 마케팅/
-├── 소상공인 010수집 최종본/   ← main_final.py (2,704건)
-└── 소상공인_영업툴/
-    └── naver-diagnosis/       ← FastAPI 웹앱 (최신)
-```
-
-**변경한 파일:**
-- `CLAUDE.md` — 자동저장 규칙 강화
-- `.claude/commands/save.md` — /save 커맨드 신규 생성
-- `memory/project_010_collector.md` — 최신 위치/상태로 업데이트
+기존 수정:
+- `services/scorer.py` — 업종별 가중치 자동 적용, 새소식패널티, 답글률, 경쟁사 상대점수
+- `services/ppt_generator.py` — 표지 충격 문구, 경쟁사 비교 슬라이드, 손익분기 슬라이드, 개선 슬라이드 "비어있는 항목" 형식으로 변경 (7→9슬라이드)
+- `models.py` — DiagnosisHistory 신규 컬럼 6개 추가 + BusinessPriority 모델 신규
+- `routers/__init__.py` — message_router, batch_router 등록
+- `main.py` — 신규 라우터 2개 등록
+- `requirements.txt` — openpyxl==3.1.2 추가
 
 **다음 세션에서 이어할 것:**
+- [ ] DB_RESET=true로 서버 재시작해서 새 컬럼 반영 확인
+- [ ] pip install openpyxl 실행
+- [ ] 메시지 생성 API 테스트 (기존 diagnosis 기록으로 /message/{id} 호출)
 - [ ] 포천/의정부 main_final.py로 실행 (양주만 해봄)
 - [ ] lian_company/.env 생성 후 파이프라인 테스트
-- [ ] 전체 플로우 E2E 테스트: python main.py → /work 한 사이클
 
 ---
 
