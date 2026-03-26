@@ -92,6 +92,7 @@
 | 2026-03-26 | /work Wave 1 순서 변경 | .claude/commands/work.md |
 | 2026-03-26 | 종범 시장 리서치 포함 | lian_company/agents/jongbum.py |
 | 2026-03-26 | 루트 CLAUDE.md 전면 업데이트 | CLAUDE.md |
+| 2026-03-26 | 영업툴 백엔드 업그레이드 (메시지/배치/경쟁사/PPT9슬라이드) | naver-diagnosis/ |
 | 2026-03-25 | 네이버 진단 PPT QA PASS | projects/번호로 자동으로 분석까지/ |
 
 ---
