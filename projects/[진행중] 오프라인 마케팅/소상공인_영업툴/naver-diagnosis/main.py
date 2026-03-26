@@ -321,6 +321,7 @@ async def result_page(history_id: int, request: Request):
     """
     from database import async_session_maker
     from models import DiagnosisHistory
+    from services.message_generator import generate_all_messages
 
     try:
         async with async_session_maker() as db:
@@ -333,9 +334,124 @@ async def result_page(history_id: int, request: Request):
                     "error_type": "not_found"
                 })
 
+            # ── priority_tag → 템플릿용 sales_priority 변환 ──────────
+            # 모델: priority_tag ("1순위"/"2순위"/"패스")
+            # 템플릿: sales_priority ("1"/"2"/"pass"), sales_priority_label
+            _tag = history.priority_tag or "2순위"
+            _priority_map = {"1순위": "1", "2순위": "2", "패스": "pass"}
+            sales_priority = _priority_map.get(_tag, "2")
+            sales_priority_label = _tag
+            # history 객체에 동적 속성 추가 (Jinja2에서 접근)
+            history.sales_priority = sales_priority
+            history.sales_priority_label = sales_priority_label
+
+            # ── 메시지 구조 → 템플릿 호환 포맷으로 변환 ──────────────
+            # generate_all_messages: {first: {type, text, label}, second: str,
+            #                          third: str, fourth: {보류:, 무응답:, ...}}
+            # 템플릿 기대: {first: {auto_version, auto_reason, text, versions, sms_text},
+            #               second: {text}, third: {text},
+            #               fourth: {versions: [{label, text}]}}
+            raw_messages = history.messages
+            if not raw_messages:
+                # 캐시 없으면 즉시 생성
+                from sqlalchemy import update as sa_update
+                msg_data = {
+                    "business_name": history.business_name,
+                    "address": history.address or "",
+                    "category": history.category or "",
+                    "photo_count": history.photo_count,
+                    "review_count": history.review_count,
+                    "blog_review_count": history.blog_review_count,
+                    "has_hours": history.has_hours,
+                    "has_menu": history.has_menu,
+                    "has_price": history.has_price,
+                    "has_intro": history.has_intro,
+                    "has_directions": history.has_directions,
+                    "has_booking": history.has_booking,
+                    "has_talktalk": history.has_talktalk,
+                    "has_smartcall": history.has_smartcall,
+                    "has_coupon": history.has_coupon,
+                    "has_news": history.has_news,
+                    "has_owner_reply": history.has_owner_reply,
+                    "has_instagram": history.has_instagram,
+                    "has_kakao": history.has_kakao,
+                    "has_menu_description": history.has_menu_description,
+                    "keywords": history.keywords or [],
+                    "naver_place_rank": history.naver_place_rank,
+                    "photo_score": history.photo_score,
+                    "review_score": history.review_score,
+                    "blog_score": history.blog_score,
+                    "info_score": history.info_score,
+                    "keyword_score": history.keyword_score,
+                    "convenience_score": history.convenience_score,
+                    "engagement_score": history.engagement_score,
+                    "total_score": history.total_score,
+                    "grade": history.grade,
+                    "competitor_avg_review": history.competitor_avg_review or 0,
+                    "competitor_avg_photo": 0,
+                    "competitor_avg_blog": history.competitor_avg_blog or 0,
+                    "estimated_lost_customers": history.estimated_lost_customers or 0,
+                    "news_last_days": 0,
+                    "bookmark_count": 0,
+                }
+                raw_messages = generate_all_messages(msg_data)
+                try:
+                    await db.execute(
+                        sa_update(DiagnosisHistory)
+                        .where(DiagnosisHistory.id == history_id)
+                        .values(messages=raw_messages)
+                    )
+                    await db.commit()
+                except Exception:
+                    pass
+
+            # 템플릿 호환 구조로 변환
+            messages = _build_template_messages(raw_messages)
+
+            # ── 핵심 수치 카드 (key_metrics) ──────────────────────────
+            competitor_avg_review = history.competitor_avg_review or 0
+            key_metrics = []
+            if history.naver_place_rank and history.naver_place_rank > 0:
+                level = "warning" if history.naver_place_rank > 10 else "good"
+                key_metrics.append({
+                    "label": "현재 순위",
+                    "value": f"{history.naver_place_rank}위",
+                    "description": "1~5위 밖이면 사실상 안 보여요" if history.naver_place_rank > 5 else "상위권 노출 중",
+                    "level": level,
+                })
+            if competitor_avg_review > 0 and history.review_count >= 0:
+                level = "warning" if history.review_count < competitor_avg_review else "good"
+                key_metrics.append({
+                    "label": "리뷰 격차",
+                    "value": f"내 {history.review_count}개 vs 경쟁사 {competitor_avg_review}개",
+                    "description": "경쟁사 평균 대비 리뷰 수",
+                    "level": level,
+                })
+            if history.estimated_lost_customers and history.estimated_lost_customers > 0:
+                key_metrics.append({
+                    "label": "추정 손실 고객",
+                    "value": f"월 {history.estimated_lost_customers}명",
+                    "description": "경쟁사로 가고 있는 추정 인원",
+                    "level": "warning",
+                })
+
+            # ── 항목별 점수 (score_items) ─────────────────────────────
+            score_items = [
+                {"name": "사진", "score": int(history.photo_score)},
+                {"name": "리뷰", "score": int(history.review_score)},
+                {"name": "블로그", "score": int(history.blog_score)},
+                {"name": "정보", "score": int(history.info_score)},
+                {"name": "키워드", "score": int(history.keyword_score)},
+                {"name": "편의기능", "score": int(history.convenience_score)},
+                {"name": "참여도", "score": int(history.engagement_score)},
+            ]
+
             return templates.TemplateResponse("result.html", {
                 "request": request,
-                "history": history
+                "history": history,
+                "messages": messages,
+                "key_metrics": key_metrics,
+                "score_items": score_items,
             })
     except Exception as e:
         return templates.TemplateResponse("error.html", {
@@ -343,6 +459,66 @@ async def result_page(history_id: int, request: Request):
             "message": f"페이지 로딩 중 오류가 발생했습니다: {str(e)}",
             "error_type": "server_error"
         })
+
+
+def _build_template_messages(raw: dict) -> dict:
+    """
+    generate_all_messages 출력 → result.html 템플릿 호환 구조 변환.
+
+    raw 구조:
+      first:  {type, text, label}
+      second: str
+      third:  str
+      fourth: {보류, 무응답, 비싸다, 직접}
+
+    템플릿 기대 구조:
+      first:  {auto_version, auto_reason, text, versions: [{label, text}], sms_text}
+      second: {text}
+      third:  {text}
+      fourth: {versions: [{label, text}]}
+    """
+    if not raw:
+        return {}
+
+    first_raw = raw.get("first", {})
+    fourth_raw = raw.get("fourth", {})
+
+    # 1차: 단일 버전으로 처리 (versions 리스트 포함)
+    first = {
+        "auto_version": True,
+        "auto_reason": f"자동 선택: {first_raw.get('label', '')} ({first_raw.get('type', '')}형)",
+        "text": first_raw.get("text", ""),
+        "sms_text": None,
+        "versions": [
+            {
+                "label": first_raw.get("label", ""),
+                "text": first_raw.get("text", ""),
+                "sms_text": None,
+            }
+        ],
+    }
+
+    # 2차: 문자열 → {text}
+    second = {"text": raw.get("second", "")}
+
+    # 3차: 문자열 → {text}
+    third = {"text": raw.get("third", "")}
+
+    # 4차: 상황별 버전 목록으로 변환
+    fourth_labels = {"보류": "보류할 때", "무응답": "무응답일 때", "비싸다": "비싸다고 할 때", "직접": "직접 하겠다고 할 때"}
+    fourth_versions = [
+        {"label": fourth_labels.get(k, k), "text": v}
+        for k, v in fourth_raw.items()
+        if v
+    ]
+    fourth = {"versions": fourth_versions}
+
+    return {
+        "first": first,
+        "second": second,
+        "third": third,
+        "fourth": fourth,
+    }
 
 
 @app.get("/error", response_class=HTMLResponse)
