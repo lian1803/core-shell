@@ -166,6 +166,7 @@ class DiagnosisHistory(Base):
             "industry_type": self.industry_type,
             "priority_tag": self.priority_tag,
             "competitor_avg_review": self.competitor_avg_review,
+            "competitor_avg_photo": self.competitor_avg_photo,
             "competitor_avg_blog": self.competitor_avg_blog,
             "estimated_lost_customers": self.estimated_lost_customers,
             "messages": self.messages,
