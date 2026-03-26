@@ -72,9 +72,9 @@
 | 항목 | 상태 |
 |------|------|
 | Git 초기화 | ✅ 완료 |
-| 자동 커밋 hook | ✅ 설정됨 (.claude/settings.json) |
-| GitHub 원격 연결 | ❌ 미완료 — 레포 생성 후 URL 필요 |
-| 자동 push | ❌ 원격 연결 후 활성화 |
+| 자동 커밋 hook | ✅ 작동 중 (Edit/Write 시 자동 커밋+push) |
+| GitHub 원격 | ✅ 연결됨 (https://github.com/lian1803/LianCP.git) |
+| 자동 push | ✅ 작동 중 |
 
 ---
 
