@@ -85,11 +85,23 @@ def run(context: dict, client: anthropic.Anthropic) -> str:
     idea = context.get("clarified", context.get("idea", ""))
     prd = context.get("jihun", "")
     strategy = context.get("minsu", "")
+    research = context.get("seoyun", "")
+    trends = context.get("taeho", "")
+    verification = context.get("haeun", "")
     is_commercial = context.get("is_commercial", False)
     full_response = ""
 
     content = f"""아이디어: {idea}
 유형: {"상용화 서비스" if is_commercial else "개인 툴"}
+
+[서윤 - 시장 리서치 (Perplexity)]
+{research}
+
+[태호 - 트렌드 스카우팅]
+{trends}
+
+[하은 - 팩트 검증]
+{verification}
 
 [민수 - 전략 (기술 방향 참고)]
 {strategy}
@@ -97,7 +109,7 @@ def run(context: dict, client: anthropic.Anthropic) -> str:
 [지훈 - PRD]
 {prd}
 
-Claude Code 복붙용 구현 지시서를 작성해줘."""
+Claude Code 복붙용 구현 지시서를 작성해줘. 시장 리서치 섹션을 반드시 포함해라."""
 
     with client.messages.stream(
         model=MODEL,
