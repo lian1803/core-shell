@@ -185,9 +185,10 @@ class CompetitorAnalyzer:
             await page.goto(url, wait_until="domcontentloaded", timeout=timeout_ms)
             await page.wait_for_timeout(2000)
 
+            safe_name = business_name.replace("'", "\\'")
             rank = await page.evaluate(f"""
                 () => {{
-                    const target = '{business_name.replace("'", "\\'")}';
+                    const target = '{safe_name}';
                     const cards = document.querySelectorAll('li._item, .VH7TP, ._3StCU, .CHC5F');
                     for (let i = 0; i < cards.length; i++) {{
                         const text = cards[i].innerText || '';
