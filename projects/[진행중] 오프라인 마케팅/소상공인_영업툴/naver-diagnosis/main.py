@@ -562,6 +562,57 @@ async def error_page(request: Request, message: str = "오류가 발생했습니
         """)
 
 
+@app.get("/history", response_class=HTMLResponse)
+async def history_page(request: Request):
+    """
+    진단 이력 목록 페이지 렌더링.
+    history.html이 {histories} 컨텍스트를 기대하므로 직접 DB 조회 후 전달.
+    """
+    from database import async_session_maker
+    from models import DiagnosisHistory
+    from sqlalchemy import select, desc
+
+    try:
+        async with async_session_maker() as db:
+            result = await db.execute(
+                select(DiagnosisHistory)
+                .order_by(desc(DiagnosisHistory.created_at))
+                .limit(200)
+            )
+            histories = result.scalars().all()
+
+            # priority_tag → sales_priority / sales_priority_label 동적 속성 추가
+            _priority_map = {"1순위": "1", "2순위": "2", "패스": "pass"}
+            for h in histories:
+                _tag = h.priority_tag or "2순위"
+                h.sales_priority = _priority_map.get(_tag, "2")
+                h.sales_priority_label = _tag
+
+            return templates.TemplateResponse("history.html", {
+                "request": request,
+                "histories": histories,
+            })
+    except Exception as e:
+        return templates.TemplateResponse("error.html", {
+            "request": request,
+            "message": f"이력 페이지 로딩 오류: {str(e)}",
+            "error_type": "server_error",
+        })
+
+
+@app.get("/batch", response_class=HTMLResponse)
+async def batch_page(request: Request):
+    """배치 진단 페이지 렌더링."""
+    try:
+        return templates.TemplateResponse("batch.html", {"request": request})
+    except Exception as e:
+        return templates.TemplateResponse("error.html", {
+            "request": request,
+            "message": f"배치 페이지 로딩 오류: {str(e)}",
+            "error_type": "server_error",
+        })
+
+
 @app.get("/health")
 async def health_check():
     """헬스 체크 엔드포인트"""
