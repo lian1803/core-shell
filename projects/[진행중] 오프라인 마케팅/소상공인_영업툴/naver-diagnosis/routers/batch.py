@@ -57,6 +57,27 @@ async def _crawl_callback_factory(app_state):
             if not crawl_data:
                 return None
 
+            # 키워드 검색량 조회 (배치에서는 최대 3개로 제한)
+            if crawl_data.get("keywords"):
+                try:
+                    from services.naver_search_ad import NaverSearchAdAPI
+                    ad_api = NaverSearchAdAPI()
+                    enriched = []
+                    for kw in crawl_data["keywords"][:3]:
+                        kw_name = kw if isinstance(kw, str) else kw.get("keyword", "")
+                        if not kw_name:
+                            continue
+                        stats = await ad_api.get_keyword_stats(kw_name)
+                        enriched.append({
+                            "keyword": kw_name,
+                            "search_volume": (stats.get("monthly_search_pc", 0) or 0) + (stats.get("monthly_search_mobile", 0) or 0),
+                            "rank": 0,
+                        })
+                    if enriched:
+                        crawl_data["keywords"] = enriched
+                except Exception as e:
+                    print(f"[Batch] 키워드 검색량 조회 오류: {e}")
+
             # 점수 계산
             scores = DiagnosisScorer.calculate_all(crawl_data)
             crawl_data.update(scores)
