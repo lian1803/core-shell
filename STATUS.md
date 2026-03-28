@@ -4,34 +4,34 @@
 
 ---
 
-## 마지막 세션 (2026-03-28 — 팀플 동기부여 웹앱 PRD 작성 완료)
+## 마지막 세션 (2026-03-28 — 팀플 Wave 1 CDO 분석 완료)
 
 **뭘 했나 (2026-03-28 세션):**
-AI 부트캠프 팀플용 동기부여 + 진행 추적 웹앱 PRD 완성.
-항해/보물섬 테마, 4인 팀 공동 목표(수익화) + 개인 목표 시스템 설계.
+항해 팀플 Voyage App Wave 1 CDO 분석 완료.
+디자인 시스템 + 컴포넌트 목록 + 화면 레이아웃 + 애니메이션 설계 전체.
 
-**제품 핵심:**
-- 공동 마일스톤(섬) + 개인 목표 연동
-- 목표 완료 → 승선 애니메이션 → 전원 승선 시 출항
-- 일일 저널 (오늘 한 것/느낀 것/내일 할 것) + Gemini Flash AI 응원
-- 개인 레벨 (10단계 칭호: 견습 선원 → 전설의 항해자)
-- 팀 레벨 (배 비주얼 7단계: 뗏목 → 보물선)
-- 팀원 응원 기능 (승선 완료자가 미완료자 응원)
-
-**기술 스택:**
-- Frontend: Next.js 14 (TypeScript) + Tailwind + Framer Motion
-- Auth: NextAuth.js (Google 로그인)
-- DB: Supabase (PostgreSQL)
-- AI: Gemini 2.0 Flash API
-- Deploy: Vercel
+**CDO 주요 결정:**
+- 컬러 팔레트: ocean-deep(#4B9FE1) / sand(#FFE4A0) / coral(#FF8A7A) / gold(#FFD95A)
+- 팀원 아바타: 4색 고정 (파랑/노랑/코랄/보라) — created_at 순서로 자동 배정
+- 배 7단계: 이모지 + CSS 조합 (이모지: 🪵→⛵→⛵→🚢→🚢→🚢→🏴‍☠️+🚢)
+- 승선 애니메이션: 아바타 포물선 이동 (섬→배), Framer Motion 키프레임
+- 출항 애니메이션: 배 곡선 이동 + ConfettiEffect (2.5초)
+- 리텐션 트릭 8개: 미완성 루프, 스트릭 공개, AI 메시지 기대감 등
 
 **신규 생성 파일:**
-- `projects/[진행] 팀플/PRD.md` ← 완전한 PRD (10개 섹션, 데이터 모델, 레벨 설계 포함)
+- `projects/[진행] 팀플/wave1_cdo.md` ← CDO 분석 완성본 (디자인 시스템 + 전체 화면 설계)
+
+이전 세션 (2026-03-28 — PRD + CPO + CTO 분석):
+- `projects/[진행] 팀플/PRD.md` ← 완전한 PRD
+- `projects/[진행] 팀플/CLAUDE.md` ← 기술 스택 + 데이터 모델
+- `projects/[진행] 팀플/wave1_cpo.md` ← CPO 분석
+- `projects/[진행] 팀플/wave1_cto.md` ← CTO 분석
 
 **다음 세션에서 이어할 것:**
-- CLAUDE.md 작성 (종범 에이전트 통해 설계서 생성)
-- /work 실행하여 Wave 1~6 자동 개발 시작
-- Supabase 프로젝트 + Gemini API 키 준비
+- Wave 2: FE + BE 코드 작성 실행
+- Supabase 프로젝트 생성 (URL/KEY 확보)
+- Google OAuth 설정 (CLIENT_ID/SECRET 확보)
+- `projects/[진행] 팀플/voyage-app/` 폴더에서 Next.js 프로젝트 생성
 
 ---
 
