@@ -56,9 +56,18 @@ def analyze_video(client, video_path: str) -> dict:
     print(f"  분석 중: {filename}")
     print(f"{'='*60}")
 
-    # Gemini Files API로 업로드
+    # Gemini Files API로 업로드 (파일명 특수문자 우회)
+    ext = os.path.splitext(video_path)[1].lower()
+    mime_map = {".mp4": "video/mp4", ".mov": "video/quicktime", ".avi": "video/x-msvideo",
+                ".mkv": "video/x-matroska", ".webm": "video/webm", ".m4v": "video/mp4"}
+    mime_type = mime_map.get(ext, "video/mp4")
+
     print("  [업로드 중...]", end="", flush=True)
-    uploaded = client.files.upload(file=video_path)
+    with open(video_path, "rb") as f:
+        uploaded = client.files.upload(
+            file=f,
+            config=types.UploadFileConfig(display_name="video", mime_type=mime_type)
+        )
 
     # 업로드 완료 대기
     while uploaded.state.name == "PROCESSING":
