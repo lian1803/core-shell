@@ -35,6 +35,13 @@ CLAUDE.md를 읽고 다음을 파악해라:
 
 ## Wave 1: C-Level 독립 분석 (채널→CPO+CTO→CDO)
 
+**🚀 Wave 1 시작** (Discord 알림)
+```bash
+curl -X POST "$DISCORD_WEBHOOK_URL" \
+  -H "Content-Type: application/json" \
+  -d '{"embeds":[{"title":"🚀 Wave 1 시작: C-Level 분석","description":"CPO + CTO + CDO 독립 분석 진행 중...","color":3447003}]}'
+```
+
 ### Wave 1-0: 수아 채널 사전 판단 (Sonnet) — 상용화만
 agents/marketing.md의 "Wave 1 채널 사전 판단" 기준으로 실행:
 - CLAUDE.md 타겟/시장 정보 기반 주력 채널 TOP 2 빠르게 판단
@@ -43,7 +50,7 @@ agents/marketing.md의 "Wave 1 채널 사전 판단" 기준으로 실행:
 
 개인 툴이면 이 단계 스킵.
 
-### CPO (Opus) + CTO (Opus) — 병렬 실행
+### CPO (Sonnet) + CTO (Sonnet) — 병렬 실행
 수아 채널 판단과 동시에 실행 가능 (CDO만 수아 결과 필요).
 
 **CPO** — agents/cpo.md 기준:
@@ -73,6 +80,13 @@ agents/cdo.md 기준으로 실행:
 
 ## Wave 2: 크로스 토론 + 기획 확정
 
+**🔄 Wave 2 시작** (Discord 알림)
+```bash
+curl -X POST "$DISCORD_WEBHOOK_URL" \
+  -H "Content-Type: application/json" \
+  -d '{"embeds":[{"title":"🔄 Wave 2 시작: 크로스 토론","description":"CPO ↔ CTO ↔ CDO 토론 및 기획 확정 중...","color":3447003}]}'
+```
+
 ### CPO ↔ CTO 토론
 - CPO 관점: 비즈니스적으로 맞는가
 - CTO 관점: 기술적으로 가능한가, 더 나은 방법은
@@ -93,6 +107,13 @@ agents/pm.md 기준으로 실행:
 ---
 
 ## ⛔ 리안 컨펌 (Wave 2 완료 후, Wave 3 시작 전)
+
+**⏸️ Wave 2 완료 — 리안 컨펌 대기** (Discord 알림)
+```bash
+curl -X POST "$DISCORD_WEBHOOK_URL" \
+  -H "Content-Type: application/json" \
+  -d '{"embeds":[{"title":"⏸️ Wave 2 완료 — 리안 컨펌 필요","description":"CPO/CTO/CDO 분석 완료. 리안의 승인 대기 중...","color":16776960}]}'
+```
 
 **반드시 여기서 멈추고 리안에게 확인받아라. 자동으로 넘어가지 마라.**
 
@@ -132,6 +153,13 @@ agents/pm.md 기준으로 실행:
 
 ## Wave 3: 구현 (FE + BE 병렬)
 
+**⚙️ Wave 3 시작** (Discord 알림)
+```bash
+curl -X POST "$DISCORD_WEBHOOK_URL" \
+  -H "Content-Type: application/json" \
+  -d '{"embeds":[{"title":"⚙️ Wave 3 시작: FE + BE 구현","description":"Frontend와 Backend 코드 생성 중... (병렬)","color":3447003}]}'
+```
+
 ### Backend (Sonnet)
 agents/be.md 기준:
 - API 전체 구현
@@ -147,7 +175,32 @@ agents/fe.md 기준:
 
 ---
 
+## Wave 3.5: 린터 + 정적 분석 (자동)
+
+Wave 3 코드 생성 완료 후, Wave 4 전에 자동 실행.
+
+```bash
+# Frontend 린터
+cd src/frontend && npx eslint . --ext .ts,.tsx --fix 2>&1 | head -50
+
+# Backend 린터
+cd src/backend && python -m ruff check . --fix 2>&1 | head -50
+```
+
+결과 저장 → `qa/linter_results.md`
+- 자동 수정 가능한 것: 즉시 수정
+- 수동 수정 필요한 것: Wave 4 QA에 전달
+
+---
+
 ## Wave 4: 검증 (QA + CTO 통합 리뷰)
+
+**✅ Wave 4 시작: QA 검증** (Discord 알림)
+```bash
+curl -X POST "$DISCORD_WEBHOOK_URL" \
+  -H "Content-Type: application/json" \
+  -d '{"embeds":[{"title":"✅ Wave 4 시작: QA 검증","description":"코드 리뷰, 테스트, CTO 통합 리뷰 진행 중...","color":3447003}]}'
+```
 
 ### QA (Sonnet)
 agents/qa.md 기준:
@@ -155,9 +208,10 @@ agents/qa.md 기준:
 - 테스트 시나리오 3개 이상
 → `qa/test_results.md` 저장
 
-### CTO 통합 리뷰 (Sonnet)
+### CTO 통합 리뷰 (Opus) ← 전체 파이프라인에서 Opus 사용하는 유일한 지점
 - FE + BE 통합 검증
 - Engineering Rules 준수 확인
+- 아키텍처 결정 재검토 (변경 비용이 큰 부분 집중)
 → `qa/cto_review.md` 저장
 
 ---
@@ -165,6 +219,13 @@ agents/qa.md 기준:
 ## Wave 5: 마케팅 실행 + 배포 (상용화만)
 
 개인 툴이면 스킵 → Wave 6으로.
+
+**📣 Wave 5 시작: 마케팅 실행** (Discord 알림)
+```bash
+curl -X POST "$DISCORD_WEBHOOK_URL" \
+  -H "Content-Type: application/json" \
+  -d '{"embeds":[{"title":"📣 Wave 5 시작: 마케팅 실행 + 배포","description":"채널 전략 → 콘텐츠 → 배포 준비 중... (상용화만)","color":3447003}]}'
+```
 
 ### Wave 5-1: 수아 — 채널 판단 (Sonnet)
 agents/marketing.md 기준으로 실행:
@@ -200,6 +261,13 @@ agents/marketing.md 기준으로 실행:
 
 ### ⛔ Wave 5-4: 리안 컨펌 (발행 전 필수)
 
+**⏸️ Wave 5 완료 — 마케팅 컨펌 대기** (Discord 알림)
+```bash
+curl -X POST "$DISCORD_WEBHOOK_URL" \
+  -H "Content-Type: application/json" \
+  -d '{"embeds":[{"title":"⏸️ Wave 5 완료 — 마케팅 발행 컨펌 필요","description":"채널 전략, 콘텐츠, 배포 준비 완료. 리안의 최종 승인 대기 중...","color":16776960}]}'
+```
+
 **반드시 여기서 멈추고 리안에게 확인받아라.**
 
 다음 형식으로 보여줘:
@@ -233,12 +301,21 @@ agents/youngjin.md 기준으로 실행:
 - `marketing/wave5_5_성과루프.md` 저장 (언제 뭘 확인할지 체크리스트)
 
 ### 배포
-- Vercel 배포 가이드
+- Cloudflare Pages 배포 (프론트): `npx wrangler pages deploy`
+- Cloudflare Workers 배포 (백엔드): `npx wrangler deploy`
+- D1 마이그레이션: `npx wrangler d1 migrations apply DB`
 - README.md 생성
 
 ---
 
 ## Wave 6: Gemini 독립 검증 (자동 실행)
+
+**🔍 Wave 6 시작: Gemini 독립 검증** (Discord 알림)
+```bash
+curl -X POST "$DISCORD_WEBHOOK_URL" \
+  -H "Content-Type: application/json" \
+  -d '{"embeds":[{"title":"🔍 Wave 6 시작: Gemini 최종 검증","description":"모든 산출물 독립 검증 중...","color":3447003}]}'
+```
 
 Wave 5까지 모든 산출물이 생성된 후, 진짜 Gemini API(3.1 Pro)를 통한 독립 검증을 자동 실행한다.
 
@@ -278,6 +355,13 @@ final_report.md를 읽고 다음을 수행해라:
 
 ## 최종 보고
 
+**✅ UltraProduct 전체 완료** (Discord 알림)
+```bash
+curl -X POST "$DISCORD_WEBHOOK_URL" \
+  -H "Content-Type: application/json" \
+  -d '{"embeds":[{"title":"✅ UltraProduct Wave 1~6 완료!","description":"모든 산출물 생성 완료. 최종 검증 리포트 완성!","color":65280}]}'
+```
+
 모든 Wave 완료 후 리안에게 다음을 보여줘라:
 
 ```
@@ -312,13 +396,13 @@ agents/analytics.md 기준:
 
 | 역할 | 모델 | 이유 |
 |------|------|------|
-| CPO | Opus | 전략 판단은 깊이가 필요 |
-| CTO | Opus | 아키텍처 결정은 되돌리기 비쌈 |
+| CPO | Sonnet | 전략 판단, 빠른 실행 |
+| CTO | Sonnet | Wave 1 아키텍처 설계 |
 | CDO | Sonnet | 디자인 방향은 Sonnet으로 충분 |
 | PM | Sonnet | 태스크 분해는 구조적 작업 |
 | FE | Sonnet | 코드 작성은 Sonnet이 충분 |
 | BE | Sonnet | 코드 작성은 Sonnet이 충분 |
 | QA | Sonnet | 버그 탐지 + 수정 |
-| CTO 리뷰 | Sonnet | 코드 리뷰 (아키텍처는 이미 결정됨) |
+| CTO 리뷰 | **Opus** | 통합 코드 리뷰 — 전체 파이프라인 유일한 Opus 사용 |
 | 마케팅 | Sonnet | 카피/전략은 Sonnet으로 충분 |
 | Wave 6 검증 | Gemini API (외부) | 진짜 독립 검증 |
