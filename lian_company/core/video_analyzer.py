@@ -58,7 +58,7 @@ def analyze_video(client, video_path: str) -> dict:
 
     # Gemini Files API로 업로드
     print("  [업로드 중...]", end="", flush=True)
-    uploaded = client.files.upload(path=video_path)
+    uploaded = client.files.upload(file=video_path)
 
     # 업로드 완료 대기
     while uploaded.state.name == "PROCESSING":
