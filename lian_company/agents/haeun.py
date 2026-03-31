@@ -1,8 +1,9 @@
 import os
 from google import genai
 from google.genai import types
+from core.models import GEMINI_FLASH
 
-MODEL = "gemini-2.5-flash"
+MODEL = GEMINI_FLASH
 
 
 def run(context: dict, client=None) -> str:
@@ -41,7 +42,10 @@ def run(context: dict, client=None) -> str:
 ## 그럼에도 GO인 이유
 [있으면 작성, 없으면 NO-GO 권고]
 
-감이 아니라 근거로. 미검증은 미검증 표기. 솔직하게."""
+감이 아니라 근거로. 미검증은 미검증 표기. 솔직하게.
+
+마지막 줄에 반드시 JSON으로:
+{"verdict": "GO" | "NO_GO", "critical_risks": ["리스크1", "리스크2"], "severity": "CRITICAL" | "HIGH" | "MEDIUM"}"""
 
     prompt = f"아이디어: {idea}\n\n[서윤 시장조사]\n{market_research}\n\n[민수 전략]\n{strategy}\n\n냉정하게 검증해줘."
 
@@ -49,7 +53,10 @@ def run(context: dict, client=None) -> str:
     for chunk in gemini.models.generate_content_stream(
         model=MODEL,
         contents=prompt,
-        config=types.GenerateContentConfig(system_instruction=system)
+        config=types.GenerateContentConfig(
+            system_instruction=system,
+            temperature=0
+        )
     ):
         text = chunk.text or ""
         print(text, end="", flush=True)

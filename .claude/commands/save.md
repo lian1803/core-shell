@@ -17,7 +17,7 @@
 
 ## Step 2: memory/ 파일 업데이트
 
-`C:\Users\lian1\.claude\projects\C--Users-lian1-Documents-Work-LAINCP\memory\` 에서:
+`C:\Users\lian1\.claude\projects\C--Users-lian1-Documents-Work-LIANCP\memory\` 에서:
 
 1. 관련된 기존 memory 파일 찾아서 업데이트
    - project_*.md — 프로젝트 현황 변경사항 반영
@@ -32,7 +32,7 @@
 
 ## Step 3: STATUS.md 업데이트
 
-`C:\Users\lian1\Documents\Work\LAINCP\STATUS.md` 에:
+`C:\Users\lian1\Documents\Work\LIANCP\STATUS.md` 에:
 
 ```
 ## 마지막 세션 (YYYY-MM-DD)

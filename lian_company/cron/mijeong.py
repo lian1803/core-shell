@@ -3,8 +3,9 @@ import json
 from datetime import datetime, timedelta
 import anthropic
 from . import notify
+from core.models import CLAUDE_HAIKU
 
-MIJEONG_MODEL = "claude-haiku-4-5-20251001"
+MIJEONG_MODEL = CLAUDE_HAIKU
 MIJEONG_SYSTEM_PROMPT = """너는 미정이야. 리안 컴퍼니의 일일 보고담당이야.
 
 매일 아침 8시에 지난 24시간의 주요 지표를 수집해서 일일 보고서를 작성해.

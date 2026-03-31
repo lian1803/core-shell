@@ -1,8 +1,9 @@
 import os
 import anthropic
 from . import notify
+from core.models import CLAUDE_SONNET
 
-DOCTOR_MODEL = "claude-sonnet-4-6"
+DOCTOR_MODEL = CLAUDE_SONNET
 DOCTOR_SYSTEM_PROMPT = """너는 닥터야. 리안 컴퍼니의 자동 수정담당이야.
 
 센티넬(헬스체크)이나 마케팅 시스템에서 이상이 감지되면,

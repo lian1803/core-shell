@@ -24,7 +24,8 @@ load_dotenv(os.path.join(script_dir, ".env"))
 from google import genai
 from google.genai import types
 
-MODEL = "gemini-3.1-pro-preview"
+from core.models import GEMINI_PRO
+MODEL = GEMINI_PRO
 
 
 def collect_files(project_dir: str) -> str:

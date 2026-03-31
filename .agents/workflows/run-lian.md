@@ -13,7 +13,7 @@ description: 리안 컴퍼니 실행 방법
 
 1. 가상환경 활성화
 ```
-cd c:\Users\lian1\Documents\Work\LAINCP\lian_company
+cd c:\Users\lian1\Documents\Work\LIANCP\lian_company
 .\venv\Scripts\activate
 ```
 

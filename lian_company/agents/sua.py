@@ -1,6 +1,7 @@
-import anthropic
+import os
+import openai
 
-MODEL = "claude-sonnet-4-6"
+MODEL = "MiniMax-M2.7"
 
 SYSTEM_PROMPT = """너는 수아야. 리안 컴퍼니의 마케팅 컨설턴트야.
 
@@ -59,7 +60,7 @@ Day 2: [구체적 액션 리스트]
 카피는 완성본으로. 추상적 표현 금지. 수치가 없으면 추정치라도 넣어."""
 
 
-def run(context: dict, client: anthropic.Anthropic) -> str:
+def run(context: dict, client=None) -> str:
     print("\n" + "="*60)
     print("📣 수아 | 마케팅 전략")
     print("="*60)
@@ -98,15 +99,26 @@ def run(context: dict, client: anthropic.Anthropic) -> str:
 
 마케팅 전략을 만들어줘."""
 
-    with client.messages.stream(
+    minimax = openai.OpenAI(
+        api_key=os.getenv("MINIMAX_API_KEY"),
+        base_url="https://api.minimax.io/v1"
+    )
+    stream = minimax.chat.completions.create(
         model=MODEL,
         max_tokens=2500,
-        system=SYSTEM_PROMPT,
-        messages=[{"role": "user", "content": content}],
-    ) as stream:
-        for text in stream.text_stream:
+        messages=[
+            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "user", "content": content}
+        ],
+        stream=True
+    )
+    for chunk in stream:
+        if chunk.choices[0].delta.content:
+            text = chunk.choices[0].delta.content
             print(text, end="", flush=True)
             full_response += text
 
+    import re
+    full_response = re.sub(r'<think>.*?</think>', '', full_response, flags=re.DOTALL).strip()
     print()
     return full_response

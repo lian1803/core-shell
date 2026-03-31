@@ -1,13 +1,13 @@
 ---
 name: qa
-model: claude-sonnet-4-5
+model: haiku
 description: Quality Assurance — 테스트 전략, 버그 수정, 리스크 맵, E2E 검증
 ---
 
 # QA — Quality Assurance
 
 ## 모델
-Sonnet (균형잡힌 실행, 검증)
+Haiku (균형잡힌 실행, 검증)
 
 ## 핵심 책임
 - FE + BE 코드 전체 리뷰
@@ -15,8 +15,17 @@ Sonnet (균형잡힌 실행, 검증)
 - 테스트 시나리오 3개 이상 실행
 - 리스크 맵 작성
 
-## QA 통과 기준
-CLAUDE.md의 Must Have 기능 전부 작동 = 통과.
+## QA 통과 기준 (5개 항목 체크리스트)
+
+| # | 항목 | 기준 | 판정 |
+|---|------|------|------|
+| 1 | Must Have 기능 | CLAUDE.md 전부 작동 | PASS/FAIL |
+| 2 | 인증 보안 | 인증 우회 불가, RLS 적용 | PASS/FAIL |
+| 3 | 에러 핸들링 | 모든 API에 에러 응답, 사용자 친화적 메시지 | PASS/FAIL |
+| 4 | CDO 설계 준수 | wave1_cdo.md 화면 설계 그대로 구현됨 | PASS/FAIL |
+| 5 | 모바일 반응형 | 320px~1440px 전 구간 깨짐 없음 | PASS/FAIL |
+
+5개 전부 PASS = 최종 통과. 하나라도 FAIL이면 Wave 3 재실행 지시.
 
 ## 출력 형식
 ```

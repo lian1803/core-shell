@@ -1,6 +1,6 @@
 """
 DiscussionRoom — 민수(전략)와 하은(검증)의 토론 루프
-최대 2라운드. 시은이 라운드 분석.
+최대 1라운드. 시은이 라운드 분석.
 """
 import anthropic
 import os
@@ -25,7 +25,7 @@ def analyze_round(round_num: int, minsu_text: str, haeun_text: str, client: anth
     full_response = ""
     with client.messages.stream(
         model="claude-sonnet-4-6",
-        max_tokens=800,
+        max_tokens=500,
         system=system,
         messages=[{"role": "user", "content": content}],
         temperature=0.3,
@@ -43,7 +43,7 @@ def minsu_revise(original_strategy: str, haeun_objections: str, round_analysis: 
     from openai import OpenAI
 
     print(f"\n  [민수 전략 수정 중...]")
-    openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+    openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"), timeout=90.0)
 
     system = """너는 민수야. 하은의 반론을 반영해서 전략을 수정해.
 반론 중 타당한 것은 수정하고, 타당하지 않은 것은 근거를 들어 반박해.
@@ -111,7 +111,7 @@ def haeun_final_check(revised_strategy: str, original_objections: str, idea: str
 class DiscussionRoom:
     """민수↔하은 토론 루프 관리. 최대 2라운드."""
 
-    MAX_ROUNDS = 2
+    MAX_ROUNDS = 1
 
     def run(self, context: dict, client: anthropic.Anthropic) -> dict:
         """

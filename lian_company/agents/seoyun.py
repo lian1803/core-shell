@@ -1,7 +1,8 @@
 import os
 from openai import OpenAI
+from core.models import SONAR_PRO
 
-MODEL = "sonar-pro"
+MODEL = SONAR_PRO
 
 
 def run(context: dict, client=None) -> str:
@@ -13,7 +14,8 @@ def run(context: dict, client=None) -> str:
 
     perplexity = OpenAI(
         api_key=os.getenv("PERPLEXITY_API_KEY"),
-        base_url="https://api.perplexity.ai"
+        base_url="https://api.perplexity.ai",
+        timeout=90.0,
     )
 
     system = """너는 서윤이야. 리안 컴퍼니의 시장 리서처야. 실시간 웹 검색으로 데이터를 수집해.

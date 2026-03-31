@@ -1,9 +1,22 @@
 import os
 import anthropic
+from concurrent.futures import ThreadPoolExecutor
 from dotenv import load_dotenv
-from agents import seoyun, minsu, haeun, junhyeok, jihun, jongbum, sua, taeho
+from agents import sieun, seoyun, minsu, haeun, junhyeok, taeho, jihun
+from core.handoff import PipelineHandoff
+from core.discussion import DiscussionRoom
 from core.ui import print_step, print_save_ok, print_section
 from core.output import create_output_dir, save_file
+from core.notifier import (
+    notify_agent_complete,
+    notify_discussion_round,
+    notify_verdict,
+    notify_execution_start,
+    notify_completion,
+    notify_error,
+    wait_confirm,
+)
+from teams.education.pipeline import run as build_team
 
 load_dotenv()
 
@@ -30,37 +43,84 @@ def run_pipeline(sieun_result: dict) -> None:
 
     # ── 이사팀 ──────────────────────────────────────────────────
 
-    # 태호: 트렌드 먼저 (선택적, 빠르게)
-    print(f"\n[1/9] 트렌드 스카우팅...")
-    taeho_result = taeho.run(context, client)
+    # 태호 + 서윤: 병렬 실행 (둘 다 아이디어만 필요, 서로 독립)
+    print(f"\n[1-2/9] 트렌드 + 시장조사 (병렬)...")
+
+    def _run_taeho():
+        try:
+            return taeho.run(context, client)
+        except Exception as e:
+            print(f"\n⚠️  태호 에러 (건너뜀): {e}")
+            return f"트렌드 스카우팅 실패: {e}"
+
+    def _run_seoyun():
+        try:
+            return seoyun.run(context, client)
+        except Exception as e:
+            print(f"\n⚠️  서윤 에러 (건너뜀): {e}")
+            return f"시장조사 실패: {e}"
+
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        fut_taeho = pool.submit(_run_taeho)
+        fut_seoyun = pool.submit(_run_seoyun)
+        taeho_result = fut_taeho.result()
+        seoyun_result = fut_seoyun.result()
+
     context["taeho"] = taeho_result
     save_file(output_dir, "08_트렌드_태호.md", taeho_result)
     print_save_ok("08_트렌드_태호.md")
+    notify_agent_complete("태호 | 트렌드 스카우팅", 1, 9)
 
-    # 서윤: 시장조사
-    print(f"\n[2/9] 시장조사...")
-    seoyun_result = seoyun.run(context, client)
     context["seoyun"] = seoyun_result
     save_file(output_dir, "01_시장조사_서윤.md", seoyun_result)
     print_save_ok("01_시장조사_서윤.md")
+    notify_agent_complete("서윤 | 시장조사", 2, 9)
 
     # 민수: 전략
     print(f"\n[3/9] 전략 수립...")
-    minsu_result = minsu.run(context, client)
+    try:
+        minsu_result = minsu.run(context, client)
+    except Exception as e:
+        print(f"\n⚠️  민수 에러 (건너뜀): {e}")
+        minsu_result = f"전략 수립 실패: {e}"
     context["minsu"] = minsu_result
     save_file(output_dir, "02_전략_민수.md", minsu_result)
     print_save_ok("02_전략_민수.md")
+    notify_agent_complete("민수 | 전략 수립", 3, 9)
 
     # 하은: 검증
     print(f"\n[4/9] 검증/반론...")
-    haeun_result = haeun.run(context, client)
+    try:
+        haeun_result = haeun.run(context, client)
+    except Exception as e:
+        print(f"\n⚠️  하은 에러 (건너뜀): {e}")
+        haeun_result = f"검증 실패: {e}"
     context["haeun"] = haeun_result
     save_file(output_dir, "03_검증_하은.md", haeun_result)
     print_save_ok("03_검증_하은.md")
+    notify_agent_complete("하은 | 검증/반론", 4, 9)
+
+    # 토론 루프: 민수↔하은 (최대 2라운드)
+    print(f"\n[4.5/9] 토론 루프...")
+    try:
+        discussion = DiscussionRoom()
+        context = discussion.run(context, client)
+    except Exception as e:
+        print(f"\n⚠️  토론 루프 에러 (건너뜀): {e}")
+        context["discussion_transcript"] = []
+    save_file(output_dir, "03b_토론_결과.md", "\n\n".join([
+        f"## 라운드 {t['round']}\n{t['analysis']}\n\n[민수 수정]\n{t['minsu_revised']}\n\n[하은 최종]\n{t['haeun_final']}"
+        for t in context.get("discussion_transcript", [])
+    ]) or "토론 없음")
+    print_save_ok("03b_토론_결과.md")
 
     # 준혁: 최종 판단
     print(f"\n[5/9] 최종 판단...")
-    junhyeok_result = junhyeok.run(context, client)
+    try:
+        junhyeok_result = junhyeok.run(context, client)
+    except Exception as e:
+        print(f"\n⚠️  준혁 에러: {e}")
+        junhyeok_result = {"text": f"판단 실패: {e}", "verdict": "CONDITIONAL_GO", "score": 50}
     context["junhyeok_text"] = junhyeok_result["text"]
     context["verdict"] = junhyeok_result["verdict"]
     context["score"] = junhyeok_result["score"]
@@ -72,6 +132,8 @@ def run_pipeline(sieun_result: dict) -> None:
         "text": junhyeok_result["text"]
     }, ensure_ascii=False, indent=2))
     print_save_ok("04_최종판단_준혁.json")
+    notify_agent_complete("준혁 | 최종 판단", 5, 9)
+    notify_verdict(junhyeok_result["verdict"], junhyeok_result["score"])
 
     # GO 판단이 아니면 종료 (FORCE_GO 환경변수로 강제 통과 가능)
     if junhyeok_result["verdict"] == "NO_GO" and not os.getenv("FORCE_GO"):
@@ -91,133 +153,145 @@ def run_pipeline(sieun_result: dict) -> None:
     print(f"  이사팀 완료. 준혁 판단: {verdict_label}")
     print(f"  결과 확인: {output_dir}")
     print(f"{'='*60}")
-    print(f"\n실행팀 진행할까? 기획서 만들고 /work 준비해줄게. [ㅇㅇ/ㄴㄴ]")
-    print("리안: ", end="")
-    confirm = input().strip().lower()
 
-    if confirm in ("ㄴㄴ", "ㄴ", "no", "n", "취소"):
-        print("\n알겠어. 결과는 저장돼 있어.")
-        print(f"📁 {output_dir}")
-        return
+    # CONDITIONAL_GO면 리안 컨펌 필요, GO면 자동 진행
+    if junhyeok_result["verdict"] == "CONDITIONAL_GO":
+        should_proceed = wait_confirm("조건부 GO — 실행팀 진행할까? [y/n]")
+        if not should_proceed:
+            print("\n알겠어. 결과는 저장돼 있어.")
+            print(f"📁 {output_dir}")
+            return
+        print("\n실행팀 진행 승인됨.")
+    else:
+        print(f"\n실행팀 자동 진행 (GO 판정)")
 
-    # ── 실행팀 ──────────────────────────────────────────────────
+    notify_execution_start()
+
+    # ── 지훈: PRD 작성 ────────────────────────────────────────────
+
+    print(f"\n[6/9] PRD 작성 (지훈)...")
+    try:
+        prd_result = jihun.run(context, client)
+        context["prd"] = prd_result
+    except Exception as e:
+        print(f"\n⚠️  지훈 에러: {e}")
+        prd_result = f"PRD 작성 실패: {e}"
+        context["prd"] = prd_result
+    save_file(output_dir, "05_PRD_지훈.md", prd_result)
+    print_save_ok("05_PRD_지훈.md")
+    notify_agent_complete("지훈 | PRD 작성", 6, 9)
+
+    # ── PipelineHandoff: 소프트웨어 프로젝트면 브리핑 문서 생성 ──────
+
+    is_software = context.get("is_software", False)
+    handoff_path = None
+    if is_software:
+        print(f"\n[6.5/9] UltraProduct 브리핑 문서 생성...")
+        try:
+            handoff = PipelineHandoff(context, output_dir)
+            handoff_path = handoff.generate()
+            print(f"✅ 브리핑 문서 생성: {handoff_path}")
+            print(f"\n{'='*60}")
+            print(f"  🚀 소프트웨어 프로젝트 — UltraProduct 준비 완료!")
+            print(f"{'='*60}")
+            print(f"  다음 단계:")
+            print(f"  1. 아래 폴더로 이동:")
+            print(f"     cd \"{handoff_path}\"")
+            print(f"  2. Claude Code 실행:")
+            print(f"     claude")
+            print(f"  3. /work 입력 → Wave 3부터 자동 실행")
+            print(f"{'='*60}\n")
+        except Exception as e:
+            print(f"\n⚠️  핸드오프 에러: {e}")
+
+    # ── 리안 인터뷰 + 팀 설계 + 교육팀 ────────────────────────────
 
     print(f"\n\n{'='*60}")
-    print(f"  실행팀 시작.")
+    print(f"  팀 설계 시작")
     print(f"{'='*60}")
 
-    # 지훈: PRD
-    print(f"\n[6/9] PRD 작성...")
-    jihun_result = jihun.run(context, client)
-    context["jihun"] = jihun_result
-    save_file(output_dir, "05_PRD_지훈.md", jihun_result)
-    print_save_ok("05_PRD_지훈.md")
+    # 시은: 리안 워크플로우 인터뷰
+    print(f"\n[6/8] 리안 인터뷰 (실제 워크플로우 파악)...")
+    try:
+        interview = sieun.interview_for_team(context, client)
+        context["interview"] = interview
+    except Exception as e:
+        print(f"\n⚠️  인터뷰 에러: {e}")
+        context["interview"] = ""
+    save_file(output_dir, "05_리안인터뷰_시은.md", context.get("interview", ""))
+    print_save_ok("05_리안인터뷰_시은.md")
 
-    # ── 리안 PRD 토론 ────────────────────────────────────────────
-    prd_version = 1
-    while True:
-        print(f"\n{'='*60}")
-        print(f"  PRD v{prd_version} 완료.")
-        print(f"  수정할 거 있으면 말해줘. 없으면 'ok' 입력.")
-        print(f"{'='*60}")
-        print("리안: ", end="")
-        feedback = input().strip()
+    # 시은: 팀 구성 설계
+    print(f"\n[7/8] 팀 구성 설계...")
+    try:
+        team_name, team_purpose = sieun.design_team(context, client)
+    except Exception as e:
+        print(f"\n⚠️  시은 팀 설계 에러: {e}")
+        team_name = project_name + "_팀"
+        team_purpose = context.get("clarified", "")
+    save_file(output_dir, "06_팀설계_시은.md", f"# 팀 설계\n\n팀 이름: {team_name}\n\n팀 업무:\n{team_purpose}")
+    print_save_ok("06_팀설계_시은.md")
+    notify_agent_complete("시은 | 팀 구성 설계", 7, 8)
 
-        if feedback.lower() in ("ok", "ㅇㅇ", "진행해", "좋아", "괜찮아", "없어", ""):
-            break
+    # 리안 확인 + 수정
+    print(f"\n\n{'='*60}")
+    print(f"  📋 시은이 설계한 팀:")
+    print(f"  팀 이름: {team_name}")
+    print(f"  팀 업무:")
+    for line in team_purpose.split("\n")[:8]:
+        if line.strip():
+            print(f"    {line.strip()}")
+    print(f"{'='*60}")
+    print(f"\n리안, 이대로 갈까? (수정할 거 있으면 말해, 없으면 엔터)")
+    print("리안: ", end="")
+    try:
+        team_feedback = input().strip()
+    except EOFError:
+        team_feedback = ""
 
-        prd_version += 1
-        context["lian_feedback"] = feedback
-        context["previous_prd"] = context["jihun"]
-        print(f"\n[PRD v{prd_version}] 피드백 반영해서 다시 작성할게...")
-        jihun_result = jihun.run(context, client)
-        context["jihun"] = jihun_result
-        save_file(output_dir, f"05_PRD_지훈_v{prd_version}.md", jihun_result)
-        print_save_ok(f"05_PRD_지훈_v{prd_version}.md")
+    if team_feedback and team_feedback.lower() not in ("", "ㅇ", "ㅇㅇ", "ok", "맞아", "그래", "진행"):
+        # 시은이 피드백 반영해서 재설계
+        print(f"\n시은: 알겠어, 수정할게...")
+        try:
+            team_name, team_purpose = sieun.design_team(
+                {**context, "team_feedback": team_feedback}, client
+            )
+        except Exception as e:
+            print(f"⚠️  재설계 에러: {e}")
+        save_file(output_dir, "06_팀설계_시은_수정.md", f"# 팀 설계 (수정)\n\n팀 이름: {team_name}\n\n팀 업무:\n{team_purpose}")
 
-    # 피드백 컨텍스트 정리 (종범에게 넘기기 전)
-    context.pop("lian_feedback", None)
-    context.pop("previous_prd", None)
+    # 이사팀 분석 결과를 팀 업무에 포함
+    board_summary = f"""{team_purpose}
 
-    # 종범: 구현 지시서
-    print(f"\n[7/9] 구현 지시서...")
-    jongbum_result = jongbum.run(context, client)
-    context["jongbum"] = jongbum_result
-    save_file(output_dir, "06_구현지시서_종범.md", jongbum_result)
-    print_save_ok("06_구현지시서_종범.md")
+=== 이사팀 분석 결과 (팀 교육 시 참고) ===
+트렌드: {context.get('taeho', '')[:300]}
+시장조사: {context.get('seoyun', '')[:500]}
+전략: {context.get('minsu', '')[:500]}
+검증: {context.get('haeun', '')[:300]}
+Go/No-Go: {context.get('verdict', '')} ({context.get('score', '')}점)"""
 
-    # projects/{프로젝트명}/CLAUDE.md 에 저장 → /work 바로 사용 가능
-    safe_project = project_name.replace(" ", "_")
-    project_dir = os.path.join(
-        os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
-        "projects", safe_project
-    )
-    os.makedirs(project_dir, exist_ok=True)
+    # 교육팀: 자동으로 팀 생성
+    print(f"\n[7/7] 교육팀 → 팀 생성 + 교육...")
+    try:
+        team_dir = build_team(team_name, board_summary)
+        print(f"\n✅ {team_name} 생성 완료: {team_dir}")
+        notify_agent_complete(f"교육팀 | {team_name} 생성", 7, 7)
+    except Exception as e:
+        print(f"\n⚠️  교육팀 에러: {e}")
+        team_dir = None
 
-    # CLAUDE.md에 LAINCP 컨텍스트 헤더 추가
-    from datetime import date
-    project_type = "상용화 서비스" if context.get("is_commercial", False) else "개인 툴"
-    claude_md_header = f"""> **LAINCP 자동 생성 프로젝트**
-> 리안 컴퍼니 파이프라인이 생성한 구현 지시서야.
-> 이 폴더에서 Claude Code 열고 `/work` 입력하면 Wave 1~6 자동 실행돼.
->
-> - **프로젝트 유형**: {project_type}
-> - **아이디어**: {raw_idea}
-> - **생성일**: {date.today()}
+    # 이사팀 결과 저장
+    save_file(output_dir, "06_이사팀_컨텍스트.md", board_summary)
+    print_save_ok("06_이사팀_컨텍스트.md")
 
----
-
-"""
-    save_file(project_dir, "CLAUDE.md", claude_md_header + jongbum_result)
-    print(f"  /work 준비 완료: projects/{safe_project}/CLAUDE.md")
-
-    # 수아: 마케팅 (상용화만)
-    print(f"\n[9/9] 마케팅 전략...")
-    sua_result = sua.run(context, client)
-    context["sua"] = sua_result
-    save_file(output_dir, "07_마케팅_수아.md", sua_result)
-    print_save_ok("07_마케팅_수아.md")
-
-    # ── 리안 마케팅 토론 (상용화만) ──────────────────────────────
-    if context.get("is_commercial", False):
-        marketing_version = 1
-        while True:
-            print(f"\n{'='*60}")
-            print(f"  마케팅 전략 v{marketing_version} 완료.")
-            print(f"  수정할 거 있으면 말해줘. 없으면 'ok' 입력.")
-            print(f"{'='*60}")
-            print("리안: ", end="")
-            feedback = input().strip()
-
-            if feedback.lower() in ("ok", "ㅇㅇ", "진행해", "좋아", "괜찮아", "없어", ""):
-                break
-
-            marketing_version += 1
-            context["sua_feedback"] = feedback
-            context["previous_sua"] = context["sua"]
-            print(f"\n[마케팅 v{marketing_version}] 피드백 반영해서 다시 작성할게...")
-            sua_result = sua.run(context, client)
-            context["sua"] = sua_result
-            save_file(output_dir, f"07_마케팅_수아_v{marketing_version}.md", sua_result)
-            print_save_ok(f"07_마케팅_수아_v{marketing_version}.md")
-
-        context.pop("sua_feedback", None)
-        context.pop("previous_sua", None)
-
-    # ── 완료 + 새 터미널 자동 실행 ──────────────────────────────
+    # ── 완료 ──────────────────────────────────────────────────
 
     print(f"\n\n{'='*60}")
     print(f"  리안 컴퍼니 완료!")
     print(f"{'='*60}")
     print(f"\n  산출물: {output_dir}")
-    print(f"\n  UltraProduct 터미널 자동으로 열게...")
+    if team_dir:
+        print(f"  생성된 팀: {team_dir}")
 
-    import subprocess
-    abs_project_dir = os.path.abspath(project_dir)
-    subprocess.Popen(
-        f'start cmd /k "cd /d {abs_project_dir} && claude"',
-        shell=True
-    )
-
-    print(f"\n  새 터미널 창이 열렸어.")
-    print(f"  /work 입력하면 바로 시작돼.")
+    # 디스코드 완료 알림
+    notify_completion(output_dir, project_name)

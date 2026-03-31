@@ -1,0 +1,46 @@
+{
+  "base": {
+    "영업_기법.md": {
+      "tags": [
+        "영업",
+        "클로징",
+        "DM"
+      ],
+      "useful_for": [
+        "offline_marketing"
+      ],
+      "source": "교육팀 초기 수집"
+    }
+  },
+  "team_results": {
+    "offline_marketing/_research_영업전문가자료.md": {
+      "tags": [
+        "영업",
+        "SPIN",
+        "Challenger",
+        "클로징",
+        "소상공인"
+      ],
+      "saved_at": "2026-03-31T18:29:27.996370"
+    },
+    "offline_marketing/영업_전략_재설계.md": {
+      "tags": [
+        "영업",
+        "전략",
+        "퍼널",
+        "소상공인"
+      ],
+      "saved_at": "2026-03-31T18:29:28.007369"
+    },
+    "offline_marketing/영업_스크립트_v2.md": {
+      "tags": [
+        "영업",
+        "DM",
+        "스크립트",
+        "카피"
+      ],
+      "saved_at": "2026-03-31T18:29:28.016369"
+    }
+  },
+  "feedback": {}
+}

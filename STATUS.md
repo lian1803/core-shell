@@ -1,6 +1,198 @@
 # 진행 상태
 
-> Claude Code 켤 때마다 여기부터 확인. 마지막 업데이트: 2026-03-30 (테마 2/3/5 + 디스코드 완료)
+> Claude Code 켤 때마다 여기부터 확인. 마지막 업데이트: 2026-03-31 (강의 자료 전체 주입 완료)
+
+---
+
+## 2026-03-31 강의 자료 knowledge/base + 에이전트 주입 완료
+
+**작업 내용**: 자료들/12/ 폴더 HTML 7개 → Gemini 2.5 Flash로 추출 → knowledge/base + 에이전트 SYSTEM_PROMPT 주입 후 원본 삭제
+
+**변경된 파일**:
+| 파일 | 변경 내용 |
+|------|---------|
+| `knowledge/base/AI기초_비즈니스활용.md` | Part1 전체 추출 (50KB) |
+| `knowledge/base/AI툴심화_자기강화루프.md` | Part2 전체 추출 (57KB) |
+| `knowledge/base/서비스기획_원칙_완전판.md` | Part3 전체 추출 (54KB) |
+| `knowledge/base/UX_설계원칙_완전판.md` | Part4 전체 추출 (15KB) |
+| `knowledge/base/프로토타이핑_IA_UJ_PRD_가이드.md` | Part5 전체 추출 (23KB) |
+| `knowledge/base/린스타트업_방법론_완전판.md` | Part6 전체 추출 (18KB) |
+| `knowledge/base/마케팅퍼널_완전가이드.md` | 마케팅 설계자 전체 추출 (25KB) |
+| `.claude/agents/cpo.md` | Part3(서비스기획) + Part5(프로토타이핑) 섹션 추가 |
+| `.claude/agents/pm.md` | Part3(서비스기획) 섹션 추가 |
+| `.claude/agents/cdo.md` | Part4(UX설계) 섹션 추가 |
+| `.claude/agents/fe.md` | Part4(UX설계) 섹션 추가 |
+| `.claude/agents/marketing.md` | 마케팅퍼널 섹션 추가 |
+| `agents/sieun.py` | Part6(린스타트업_적용원칙) SYSTEM_PROMPT 주입 |
+| `agents/minsu.py` | Part6(전략수립_린캔버스) SYSTEM_PROMPT 주입 |
+| `agents/junhyeok.py` | Part6(GO판단_린스타트업) SYSTEM_PROMPT 주입 |
+| `teams/offline_marketing/copywriter.py` | 마케팅퍼널_카피라이팅_원칙 SYSTEM_PROMPT 주입 |
+| `자료들/12/*.html` | 원본 7개 삭제 완료 |
+
+**분석팀 신설 (이전 세션)**:
+- `teams/analysis/analyzer.py` — Gemini 2.5 Flash 비전 (이미지/영상)
+- `teams/analysis/pipeline.py` — 독립 실행 스캐너
+- `process_inbox.py` — 이미지/영상 분석팀 연동 완료
+
+**다음에 할 것**:
+1. main.py 파이프라인 end-to-end 테스트
+2. GitHub 원격 연결
+3. Phase 2: --discover 모드 (Pain 발굴, 자동 트렌드 수집)
+
+---
+
+## 2026-03-31 회사 전면 개편 완료
+
+**작업 내용**: 이사팀 재설계 + 교육팀 신설 + 오프라인 마케팅팀 신설 + 조직도 + 지식 관리 시스템
+
+**변경된 파일**:
+| 파일 | 변경 내용 |
+|------|---------|
+| `lian_company/agents/sieun.py` | interview_for_team(), design_team() 추가 (팀 설계 기능) |
+| `lian_company/core/pipeline.py` | 지훈/종범/수아 제거, 시은 인터뷰(step 6) + 팀 설계(step 7) + 교육팀(step 8) 추가 |
+| `lian_company/teams/education/` | 교육팀 신설 (curriculum_designer, trainer, team_generator, pipeline) |
+| `lian_company/teams/offline_marketing/` | 오프라인 마케팅팀 신설 (researcher/재원, strategist/승현, copywriter/예진) |
+| `lian_company/build_team.py` | 교육팀 실행 진입점 |
+| `lian_company/offline_sales.py` | 오프라인 마케팅팀 진입점 |
+| `lian_company/knowledge/manager.py` | 지식 관리 시스템 (저장/검색/피드백/공유) |
+| `lian_company/knowledge/index.json` | 지식 인덱스 (태그 기반) |
+| `회사 조직도.md` | 전 직원 조직도 신설 (팀 신설 시 자동 업데이트) |
+| `CLAUDE.md` | 전체 플로우/폴더구조/에이전트 지식체계 현행화 |
+| `가장 먼저 해야할거.md` | 최상위 방향성 추가 + 구현 상태 업데이트 + 새 폴더 마이그레이션 태스크 |
+
+**핵심 변경사항**:
+1. **지훈/종범/수아 해고** → 프로젝트별 전문 에이전트로 대체
+2. **교육팀**: Opus가 커리큘럼 설계 → Perplexity가 지식 수집 → 팀 파일 자동 생성
+3. **2단계 인터뷰**: 시은(큰 그림, 이사팀) + 팀별 디테일 인터뷰
+4. **지식 누적 루프**: 결과물 자동 저장 → 리안 피드백 → 다음 실행 시 반영
+5. **조직도 자동 업데이트**: 팀 신설 시 회사 조직도.md 자동 반영
+
+**해결한 이슈**:
+- UnicodeEncodeError (knowledge/manager.py emoji → 텍스트 괄호로 교체)
+- team_generator.py PIPELINE_TEMPLATE {team_slug} 플레이스홀더 누락 수정
+
+**다음에 할 것**:
+1. 새 폴더/ 강의 자료 → knowledge/base/ 마이그레이션 (CDO/수아/종범 해고로 지식 단절됨)
+2. inbox 분석기 구현 (qwen3-vl 로컬 비전모델 — 리안이 스크린샷 던지면 자동 분석)
+3. 자동 트렌드 수집 (태호 주기적 실행)
+4. Playwright 브라우저 자동화 (CDP 방식)
+5. main.py 파이프라인 테스트 (end-to-end)
+
+---
+
+## 2026-03-31 UI 품질 개선 + 파이프라인 최적화 완료
+
+**작업 내용**: LIANCP 파이프라인 오류 수정, 속도 개선, UI 품질 업그레이드
+
+**변경된 파일**:
+| 파일 | 변경 내용 |
+|------|---------|
+| `lian_company/.env` | ANTHROPIC_API_KEY 새 키 적용 |
+| `lian_company/agents/sieun.py` | interactive 파라미터 추가 (CLI 모드에서 input() 스킵) |
+| `lian_company/agents/taeho.py` | MiniMax→Claude Haiku 폴백 구조 추가, 60s 타임아웃 |
+| `lian_company/agents/seoyun.py` | 90s 타임아웃 추가 |
+| `lian_company/core/discussion.py` | 90s 타임아웃, MAX_ROUNDS 2→1, max_tokens 800→500 |
+| `lian_company/core/pipeline.py` | 전 에이전트 try/except 추가, 태호+서윤/종범+수아 병렬화 |
+| `lian_company/main.py` | interactive 파라미터 전달 |
+| `lian_company/verify_gemini.py` | 모델명 수정 (gemini-2.5-pro-preview-03-25) |
+| `lian_company/agents/jongbum.py` | 디자인 방향 섹션 추가 (CDO 전달용) |
+| `.claude/commands/work.md` | Agent 병렬화, wave summary 파일, Gemini 모델명 수정 |
+| `.claude/agents/cdo.md` | /theme-factory + /brand-guidelines 작업 순서 추가, Aceternity/Magic UI 추가 |
+| `.claude/agents/fe.md` | /frontend-design 스킬 + Aceternity/Magic UI 설치/사용 지침 추가 |
+
+**핵심 개선사항**:
+1. **안정성**: 에이전트 오류 시 전체 파이프라인 중단 방지 (try/except 전면 적용)
+2. **속도**: 태호+서윤 병렬, 종범+수아 병렬 → 리안 컴퍼니 ~7분 단축
+3. **UI 품질**: CDO가 /theme-factory + /brand-guidelines 호출, FE가 Aceternity UI + Magic UI 사용
+4. **디자인 컨텍스트**: 종범이 생성하는 CLAUDE.md에 "디자인 방향" 섹션 자동 포함 → CDO에게 자동 전달
+5. **work.md 병렬화**: Wave 1(CPO+CTO+수아채널), Wave 3(FE+BE), Wave 4(QA+CTO) Agent 병렬 실행
+
+**다음에 할 것**:
+- Anthropic 스킬 설치 (한 번만): `npx skills add` (frontend-design, theme-factory, brand-guidelines)
+- 파이프라인 테스트: `cd lian_company && ./venv/Scripts/python.exe main.py "테스트 아이디어"`
+
+---
+
+## 2026-03-30 Lian Dash — CDO Wave 1 완료
+
+**작업 내용**: Lian Dash UI 프로토타입 화면 설계 완료
+
+**생성된 파일**:
+| 경로 | 내용 |
+|------|------|
+| `projects/Lian_Dash/wave1_cdo.md` | CDO Wave 1 — 디자인 시스템/5개 화면 상세 레이아웃/컴포넌트 상태/반응형/FE 체크리스트 |
+
+**설계 요약**:
+- **디자인 비전**: "데이터를 보는 즐거움" — 선제적 AI 애널리틱스, Light mode 단독
+- **컬러 팔레트**: Primary=Indigo, 채널별=GA4(Blue)/Meta(Purple)/네이버SA(Emerald), Semantic colors
+- **타이포그래피**: Pretendard + Plus Jakarta Sans (KPI 숫자)
+- **5개 화면 상세 레이아웃**: 랜딩(모바일 퍼스트) / 온보딩 3단계 / 대시보드 1280px / AI 인사이트 320px 슬라이드아웃 / PDF 내보내기 모달
+- **컴포넌트**: KpiCard + TrendArrow / InsightCard(빨강/노랑/초록 border-left) / ConnectionCard / ChannelBadge / ShimmerSkeleton
+- **KPI 카드**: 수치(₩38,080,000 포맷) + 전주 대비 % + 초록↑/빨강↓ 화살표
+- **반응형**: 랜딩/온보딩 모바일 퍼스트, 대시보드 데스크탑 우선 (1024px 사이드바 숨김)
+- **애니메이션**: 날짜 필터 스켈레톤 / AI 패널 slide-in 300ms / 온보딩 순차 로딩 1.5s
+- **FE 체크리스트**: CDO-FE-01~16까지 구현 항목 정리
+
+**다음 단계**:
+1. FE Wave 3 — 실제 코드 구현 (`src/` 폴더 전체)
+2. PM Wave 2 — 크로스 토론 + 개발 계획
+
+---
+
+## 2026-03-30 AI 기반 동적 가격 결정 SaaS — Frontend Wave 3 완료
+
+**작업 내용**: wave1_cdo.md + wave2_pm_계획.md 기반 Next.js 14 Frontend 전체 구현
+
+**생성된 파일 (신규)**:
+| 경로 | 내용 |
+|------|------|
+| `src/types/index.ts` | 전체 TypeScript 타입 정의 |
+| `src/lib/api.ts` | 백엔드 API 클라이언트 (모든 엔드포인트) |
+| `src/lib/utils.ts` | 공통 유틸 (formatCurrency, debounce, easeOut 등) |
+| `src/store/useAuthStore.ts` | Zustand 인증 상태 |
+| `src/store/useOnboardingStore.ts` | Zustand 온보딩 상태 |
+| `src/store/useSimulatorStore.ts` | Zustand 시뮬레이터 상태 |
+| `src/store/useAiStore.ts` | Zustand AI 추천 상태 |
+| `src/app/layout.tsx` | 루트 레이아웃 (Inter 폰트, Sonner 토스트) |
+| `src/app/globals.css` | Tailwind + CDO 디자인 시스템 |
+| `src/app/(auth)/login/page.tsx` | 화면 1: 2분할 로그인 (Google + 이메일) |
+| `src/app/(auth)/register/page.tsx` | 회원가입 페이지 |
+| `src/app/(dashboard)/layout.tsx` | 사이드바 + 모바일 헤더 레이아웃 |
+| `src/app/(dashboard)/dashboard/page.tsx` | 화면 3: KPI 카드 + ARR 차트 + 이력 테이블 |
+| `src/app/(dashboard)/onboarding/page.tsx` | 화면 2: 4단계 온보딩 마법사 |
+| `src/app/(dashboard)/simulator/page.tsx` | 화면 4: 2열 가격 시뮬레이터 + 실시간 차트 |
+| `src/app/(dashboard)/ai-recommendations/page.tsx` | 화면 5: AI 추천 + 근거 Accordion + 로드맵 |
+| `src/app/(dashboard)/ab-comparison/page.tsx` | 화면 6: A/B 비교 + 통합 차트 |
+| `src/app/(dashboard)/export/page.tsx` | 화면 7: 리포트 미리보기 + PDF/CSV 내보내기 |
+| `src/app/(dashboard)/monitoring/page.tsx` | 화면 8: 실시간 지표 + 알림 설정 |
+| `src/app/(dashboard)/team/page.tsx` | 팀 관리 (초대 + 권한) |
+| `src/app/(dashboard)/settings/page.tsx` | 설정 (프로필 + Stripe + 알림) |
+| `src/components/layout/Sidebar.tsx` | 화면 9: 240px 사이드바 (다크) |
+| `src/components/layout/MobileHeader.tsx` | 모바일 Sheet 헤더 |
+| `src/components/dashboard/KpiCard.tsx` | KPI 카드 (카운트업 애니메이션) |
+| `src/components/dashboard/ArrChart.tsx` | ARR 라인/에리어 차트 (Recharts) |
+| `src/components/dashboard/SimulationHistoryTable.tsx` | 시뮬레이션 이력 테이블 |
+| `src/components/simulator/PriceSliderGroup.tsx` | 모델별 슬라이더 그룹 (Per-Seat/Usage/Flat) |
+| `src/components/simulator/ScenarioChart.tsx` | 시나리오 비교 차트 + 손익분기선 |
+| `src/components/ai/AiRecommendationCard.tsx` | AI 추천 Hero + Accordion + Stepper |
+| `src/components/ui/*.tsx` | shadcn/ui 12개 컴포넌트 수동 구현 |
+| `tailwind.config.ts` | CDO 컬러 팔레트 반영 |
+| `tsconfig.json` | TypeScript 설정 (@/* alias) |
+| `postcss.config.js` | PostCSS 설정 |
+| `components.json` | shadcn/ui 설정 |
+| `package.json` | FE 의존성 추가 (zustand, recharts, sonner 등) |
+
+**구현 범위 (PM FE 27개 Task 대응)**:
+- FE-01~07: 인증 + 온보딩 4단계 완료
+- FE-08~15: 대시보드 + 시뮬레이터 완료
+- FE-16~22: AI 추천 + A/B 비교 + 리포트 + 팀 관리 완료
+- FE-23~27: 모바일 반응형 + 스켈레톤 + 빈 상태 + 에러 fallback 완료
+
+**다음 단계**:
+1. `npm install` 실행 (프로젝트 루트에서)
+2. `.env.local` 파일 생성 (.env.example 복사)
+3. `npm run dev` 실행 → http://localhost:3000
+4. BE API 연결 후 demo 데이터 → 실제 데이터 전환
 
 ---
 
@@ -425,6 +617,7 @@ CTO 리뷰 결과: PASS, 버그 6개 발견 → 즉시 수정 완료
 
 | 날짜 | 변경 내용 | 파일 |
 |------|----------|------|
+| 2026-03-30 | AI 기반 동적 가격 결정 SaaS — BE Wave 3 API 전체 구현 (18개 엔드포인트, D1 스키마, 서비스 레이어) | projects/AI_기반_동적_가격_결정_SaaS/src/ |
 | 2026-03-26 | Wave 5 마케팅 전략 + 콘텐츠 완성 (블로그/카페/인스타) | marketing/wave5_1_채널전략.md, wave5_2_콘텐츠.md |
 | 2026-03-26 | CTO 통합 리뷰 — 치명 버그 4개 + 중간 2개 수정 | main.py, routers/crawl.py, routers/batch.py |
 | 2026-03-26 | /history, /batch 페이지 라우터 추가 | main.py |

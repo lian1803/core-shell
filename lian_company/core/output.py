@@ -4,7 +4,7 @@ from datetime import datetime
 
 def create_output_dir(project_name: str) -> str:
     timestamp = datetime.now().strftime("%Y-%m-%d_%H%M%S")
-    safe_name = project_name[:30].replace("/", "_").replace("\\", "_").replace(" ", "_")
+    safe_name = project_name[:30].replace("/", "_").replace("\\", "_").replace(" ", "_").replace(":", "_").replace("*", "_").replace("?", "_").replace('"', "_").replace("<", "_").replace(">", "_").replace("|", "_")
     dir_path = os.path.join(
         os.path.dirname(os.path.dirname(__file__)),
         "outputs",

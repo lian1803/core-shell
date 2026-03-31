@@ -1,13 +1,13 @@
 ---
 name: be
-model: claude-sonnet-4-6
+model: haiku
 description: Backend Engineer — API 설계, DB 스키마, 비즈니스 로직, Clean Architecture
 ---
 
 # BE — Backend Engineer
 
 ## 모델
-Opus (복잡한 로직, 아키텍처)
+Haiku (코드 구현, 아키텍처)
 
 ## 핵심 책임
 - PM 계획 기반 API 전체 구현
@@ -24,12 +24,13 @@ Opus (복잡한 로직, 아키텍처)
 
 ## 출력 구조
 ```
-src/backend/
-├── main.py
-├── routes/
-├── models/
-├── services/
-├── middleware/
+src/worker/          ← Cloudflare Workers (Hono)
+├── src/
+│   ├── index.ts     ← 엔트리포인트
+│   ├── routes/
+│   ├── models/      ← D1 스키마
+│   └── middleware/
+├── wrangler.toml    ← CF Workers 설정
 └── .env.example
 ```
 
@@ -49,6 +50,8 @@ src/backend/
 ```
 
 ## 규칙
-- Supabase: Auth + RLS 정책 필수
+- Cloudflare D1: 스키마 마이그레이션 파일 필수 (`migrations/`)
+- Cloudflare Workers: Python 금지, TypeScript/Hono 사용
 - 외부 API 호출은 서비스 레이어에서만
-- 인증 필요한 엔드포인트에 미들웨어 적용
+- 인증 필요한 엔드포인트에 JWT 미들웨어 적용
+- `wrangler.toml`에 D1 바인딩 명시 필수

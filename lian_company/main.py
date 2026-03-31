@@ -23,6 +23,7 @@ load_dotenv()
 
 from agents import sieun
 from core.pipeline import run_pipeline, get_client
+from core.notifier import notify_pipeline_start
 
 
 BANNER = """
@@ -47,6 +48,7 @@ def main():
     if len(sys.argv) > 1:
         idea = " ".join(sys.argv[1:])
         print(f"💡 아이디어: {idea}\n")
+        interactive = False
     else:
         print("💡 아이디어를 입력해줘 (엔터로 제출):")
         print("리안: ", end="")
@@ -54,22 +56,17 @@ def main():
         if not idea:
             print("아이디어를 입력해야 해.")
             sys.exit(1)
+        interactive = True
 
     # 시은: 아이디어 명확화
-    sieun_result = sieun.run(idea, client)
+    sieun_result = sieun.run(idea, client, interactive=interactive)
 
-    # 진행 확인
+    # 이사팀 자동 실행 (더 이상 확인 안 함)
     print(f"\n{'='*60}")
-    print("이사팀 실행할까? [진행해 / 취소]")
-    print("리안: ", end="")
-    try:
-        confirm = input().strip().lower()
-    except EOFError:
-        confirm = "진행해"
+    print("이사팀 자동 실행 중...")
 
-    if confirm in ("취소", "no", "n", "ㄴ"):
-        print("취소됨.")
-        sys.exit(0)
+    # 디스코드 알림
+    notify_pipeline_start(idea)
 
     # 파이프라인 실행
     run_pipeline(sieun_result)
