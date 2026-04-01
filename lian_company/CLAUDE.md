@@ -14,7 +14,7 @@ cd lian_company
 
 | 순서 | 에이전트 | 역할 | AI |
 |------|----------|------|----|
-| 1 | 태호 + 서윤 | 트렌드 스카우팅 + 시장조사 (병렬) | MiniMax / Perplexity |
+| 1 | 태호 + 서윤 | 트렌드 스카우팅 + 시장조사 (병렬) | Claude Haiku / Perplexity |
 | 2 | 민수 | 전략 수립 + 수익모델 | GPT-4o |
 | 3 | 하은 | 팩트 검증 + 반론 | Gemini |
 | 4 | 토론 루프 | 민수-하은 토론 (1라운드) + 시은 분석 | Claude Sonnet |
@@ -37,7 +37,7 @@ ANTHROPIC_API_KEY=      # Claude (시은, 준혁, 지훈, 태호 폴백)
 OPENAI_API_KEY=         # GPT-4o (민수)
 GOOGLE_API_KEY=         # Gemini (하은, 도윤, 지수)
 PERPLEXITY_API_KEY=     # Perplexity (서윤)
-MINIMAX_API_KEY=        # MiniMax (태호 트렌드 스카우팅, 선택)
+
 DISCORD_WEBHOOK_URL=    # 디스코드 알림 (선택)
 ```
 

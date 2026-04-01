@@ -16,5 +16,3 @@ GPT4O         = "gpt-4o"
 # Perplexity
 SONAR_PRO     = "sonar-pro"
 
-# MiniMax
-MINIMAX       = "MiniMax-M2.7"
