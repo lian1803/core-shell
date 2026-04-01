@@ -1,6 +1,6 @@
 # 진행 상태
 
-> Claude Code 켤 때마다 여기부터 확인. 마지막 업데이트: 2026-04-01 (naver-diagnosis 버그 수정 완료)
+> Claude Code 켤 때마다 여기부터 확인. 마지막 업데이트: 2026-04-01 (naver-diagnosis 점수/메시지 전면 업그레이드)
 
 ---
 
