@@ -167,15 +167,17 @@ def main():
     # 업무 시작 기록
     record_task_start(agent_name)
 
-    # 과거 경험 로드
+    # 과거 경험 + 자기 개발 학습 내용 로드
     memory = load_agent_memory(agent_name)
+    training = load_training_knowledge(agent_name)
+    full_context = "\n\n".join(filter(None, [memory, training]))
 
-    # 컨텍스트 구성 (경험 포함)
+    # 컨텍스트 구성 (경험 + 학습 포함)
     context = {
         "idea": task,
         "clarified": task,
         "task": task,
-        "agent_memory": memory,  # 에이전트가 참고할 과거 경험
+        "agent_memory": full_context,  # 과거 경험 + 자기 개발 학습
     }
 
     # Claude 클라이언트가 필요한 에이전트
