@@ -52,10 +52,16 @@ def run(industry: str = "소상공인 네이버 플레이스 마케팅 대행"):
     save("영업_전략_재설계.md", strategy)
 
     # Step 3: 카피라이터 — 스크립트 + PPT 생성
-    print("\n[3/3] 스크립트 + PPT 카피 생성...")
+    print("\n[3/4] 스크립트 + PPT 카피 생성...")
     copy = copywriter.run(context, client)
     context["copy"] = copy
     save("영업_스크립트_v2.md", copy)
+
+    # Step 4: 검증자 — 현장 관점 사업 검증 (Claude Opus)
+    print("\n[4/4] 현장 관점 사업 검증...")
+    validation = validator.run(context, client)
+    context["validation"] = validation
+    save("영업_사업검증.md", validation)
 
     # 보고사항들.md 업데이트
     try:
