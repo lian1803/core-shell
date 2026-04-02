@@ -107,7 +107,7 @@ def run(context: dict, client: anthropic.Anthropic) -> dict:
 
     with client.messages.stream(
         model=MODEL,
-        max_tokens=2000,
+        max_tokens=4000,
         system=SYSTEM_PROMPT,
         messages=[{"role": "user", "content": content}],
         temperature=0,
