@@ -1,24 +1,12 @@
-#!/usr/bin/env python3
-"""
-온라인마케팅팀 실행
-
-사용법:
-  python run_온라인마케팅팀.py
-  python run_온라인마케팅팀.py "업무 내용"
-"""
-import sys, os, io
-sys.path.insert(0, os.path.dirname(__file__))
-if sys.platform == "win32":
-    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
-    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding="utf-8", errors="replace")
+import sys
+import os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from dotenv import load_dotenv
 load_dotenv()
+
 from teams.온라인마케팅팀.pipeline import run
 
 if __name__ == "__main__":
-    task = " ".join(sys.argv[1:]) if len(sys.argv) > 1 else ""
-    if not task:
-        print("업무 내용 입력:")
-        task = input("> ").strip()
+    task = " ".join(sys.argv[1:]) if len(sys.argv) > 1 else "스마트스토어/쿠팡/인스타 셀러 대상 온라인 마케팅 대행 서비스 영업 — 잠재 고객 발굴 후 콜드메일/DM 초안까지"
     run(task)
