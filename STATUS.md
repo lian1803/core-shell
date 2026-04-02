@@ -4,6 +4,38 @@
 
 ---
 
+## 2026-04-02 naver-diagnosis 배치 테스트 + 메시지 대규모 버그 수정
+
+**작업 내용**: 10개 양주 미용실 배치 진단 실행 + 발견된 버그 전부 수정
+
+### 수정된 버그
+| 버그 | 수정 |
+|------|------|
+| `estimated_lost_customers = 0` 하드코딩 (batch.py line 96) | `DiagnosisScorer.calculate_estimated_lost_customers()` 실제 계산으로 교체 |
+| "사장님 사장님" — business_name 없을 때 폴백 | batch.py에 business_name 폴백 추가 |
+| review_count=0 (실제 리뷰 수 사용 안 함) | `_build_diagnosis_dict`에서 `visitor_review_count + receipt_review_count` 사용 |
+| 검색량 fallback 500 → 2000 | `_get_total_search_volume` 최솟값 수정 |
+| "비싸다" 응답에 "1개월만 해보시고" | 3개월 약정 설명 + 무상연장으로 교체 |
+| bookmark_count=0이 항상 타입C 유발 | 실제 수집 데이터 기준으로만 트리거 (사진<5장, 새소식 90일+) |
+| 내 리뷰 > 경쟁사 평균인데 타입A 선택 | 내 리뷰 ≤ 경쟁사일 때만 타입A, 초과면 타입C |
+| "소리헤어은" 조사 오류 | `_eun_neun()` 함수 추가 |
+| "네이버에서  찾는 분들" 공백 두 개 | category 없을 때 빈칸 제거 |
+
+### 배치 테스트 결과 (양주 미용실 10개)
+- 10개 전부 성공 (실패 0)
+- D등급 4개 / C등급 2개 / B등급 4개
+- 타입A (리뷰격차): 소리헤어(30명), 더예쁨헤어(35명), 미광헤어(25명)
+- 타입C (사진부족): 더이쁜머리, 헤어코코, 차헤어, 살롱레브양주점
+- 타입C (정보미완성): 포에트리헤어, 유어살롱, 이선주헤어톡
+
+### 다음 할 것
+- 레퍼런스 클라이언트 확보 대기 중 (memory/project_offline_sales_pending.md 참조)
+- 지인 답변 오면 "답변 왔어" 메시지 → Before/After 플로우 진행
+- validator.py max_tokens=2000 → 4000으로 올리기 (출력이 잘림)
+- Kakao Pay 비즈니스 계정 세팅 (리안 직접 해야 함)
+
+---
+
 ## 2026-04-02 시스템 업그레이드 Phase 1+2 완료
 
 **작업 내용**: 리안 시스템 5대 업그레이드 중 Phase 1+2 구현
