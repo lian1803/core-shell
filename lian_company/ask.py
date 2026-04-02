@@ -73,7 +73,44 @@ def get_anthropic_client():
     return anthropic.Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
 
 
+def resolve_name(name_input: str) -> str | None:
+    """이름 입력 → 모듈명 반환."""
+    key = name_input.strip().lower()
+    module_name = NAME_MAP.get(key) or NAME_MAP.get(key.rstrip("아야"))
+    if not module_name:
+        for k, v in NAME_MAP.items():
+            if key in k or k in key:
+                return v
+    return module_name
+
+
 def main():
+    from knowledge.agent_memory import (
+        load_agent_memory, save_work_log,
+        save_feedback, record_task_start, print_performance_report
+    )
+
+    # 성과 조회 모드
+    if len(sys.argv) >= 2 and sys.argv[1] == "--performance":
+        print_performance_report()
+        return
+
+    # 피드백 모드: ask.py --feedback "서윤" "4" "이번 조사 좋았어"
+    if len(sys.argv) >= 2 and sys.argv[1] == "--feedback":
+        if len(sys.argv) < 5:
+            print("사용법: ask.py --feedback '직원이름' '점수(1-5)' '피드백 내용'")
+            sys.exit(1)
+        name = sys.argv[2]
+        score_str = sys.argv[3]
+        feedback_text = " ".join(sys.argv[4:])
+        try:
+            score = int(score_str)
+        except ValueError:
+            score = None
+        save_feedback(name, "직접 피드백", feedback_text, score)
+        print(f"{name}에게 피드백 저장 완료. (점수: {score}/5)")
+        return
+
     if len(sys.argv) < 3:
         print("사용법: ask.py '직원이름' '업무내용'")
         print("\n호출 가능한 직원:")
@@ -83,24 +120,20 @@ def main():
         print("  준혁  : GO/NO-GO 판단 (Claude Opus)")
         print("  태호  : 트렌드 분석 (Claude Haiku)")
         print("  시은  : 아이디어 명확화 (Claude Sonnet)")
+        print("\n피드백: ask.py --feedback '이름' '점수' '내용'")
+        print("성과조회: ask.py --performance")
         sys.exit(1)
 
-    name_input = sys.argv[1].strip().lower()
+    name_input = sys.argv[1]
     task = " ".join(sys.argv[2:]).strip()
 
-    # 이름 매핑
-    module_name = NAME_MAP.get(name_input) or NAME_MAP.get(name_input.rstrip("아야"))
+    module_name = resolve_name(name_input)
     if not module_name:
-        # 부분 매칭 시도
-        for key, val in NAME_MAP.items():
-            if name_input in key or key in name_input:
-                module_name = val
-                break
-
-    if not module_name:
-        print(f"'{sys.argv[1]}' 직원을 찾을 수 없어.")
-        print(f"가능한 이름: {', '.join(set(NAME_MAP.keys()))}")
+        print(f"'{name_input}' 직원을 찾을 수 없어.")
         sys.exit(1)
+
+    # 한국어 이름 추출 (기록용)
+    agent_name = name_input.rstrip("아야")
 
     # 모듈 임포트
     import importlib
@@ -110,11 +143,18 @@ def main():
         print(f"에이전트 로딩 실패: {e}")
         sys.exit(1)
 
-    # 컨텍스트 구성
+    # 업무 시작 기록
+    record_task_start(agent_name)
+
+    # 과거 경험 로드
+    memory = load_agent_memory(agent_name)
+
+    # 컨텍스트 구성 (경험 포함)
     context = {
         "idea": task,
         "clarified": task,
         "task": task,
+        "agent_memory": memory,  # 에이전트가 참고할 과거 경험
     }
 
     # Claude 클라이언트가 필요한 에이전트
@@ -123,14 +163,21 @@ def main():
 
     # 실행
     print(f"\n{'='*60}")
-    print(f"직접 호출: {sys.argv[1]} ({module_name})")
+    print(f"직접 호출: {name_input} ({module_name})")
+    if memory:
+        print(f"[경험 로드됨 — 과거 기록 반영]")
     print(f"업무: {task}")
     print(f"{'='*60}")
 
     result = agent.run(context, client=client)
 
+    # 업무 완료 기록
+    result_summary = result[:300] if result else ""
+    save_work_log(agent_name, task, result_summary, success=True)
+
     print(f"\n{'='*60}")
-    print("완료")
+    print(f"완료 | 업무 기록 저장됨")
+    print(f"피드백: ask.py --feedback '{agent_name}' '점수(1-5)' '피드백 내용'")
     print(f"{'='*60}")
 
     return result
