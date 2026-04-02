@@ -95,6 +95,19 @@ curl -X POST "$DISCORD_WEBHOOK_URL" \
 
 ---
 
+## Wave 3.5: DevOps 도구 준비 (FE/BE 시작 전)
+
+**PM 완료 확인 후 → DevOps 에이전트 스폰.**
+
+**Agent — DevOps (Sonnet):**
+`wave_cto.md`, `DESIGN.md`, `wave_pm.md`, `PRD.md`, `agents/devops.md`를 읽고
+FE/BE 개발에 필요한 모든 패키지/MCP/GitHub 소스를 파악해서 `wave_devops.md`에 설치 계획을 작성해라.
+리안 컨펌 후 설치 실행.
+
+**완료 후 → Wave 4 시작.**
+
+---
+
 ## Wave 4: 구현 (FE + BE 병렬)
 
 **⚙️ Wave 4 시작: FE + BE 구현** (Discord 알림)
