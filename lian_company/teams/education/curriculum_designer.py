@@ -56,7 +56,7 @@ def run(team_name: str, team_purpose: str, client: anthropic.Anthropic) -> dict:
     full_response = ""
     with client.messages.stream(
         model=MODEL,
-        max_tokens=4000,
+        max_tokens=8000,
         messages=[{
             "role": "user",
             "content": f"""다음 팀을 신설하려고 해. 세계 최고 수준으로 만들어줘.
