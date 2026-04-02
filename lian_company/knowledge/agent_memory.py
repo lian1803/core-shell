@@ -237,5 +237,146 @@ def print_performance_report():
     print("="*50)
     for p in all_perf:
         avg = f"{p['feedback_avg']:.1f}/5" if p['feedback_avg'] else "평가 없음"
-        print(f"  {p['name']:8} | 업무 {p.get('total_tasks', 0):3}건 | 평점 {avg} | 최근 활동: {p.get('last_active', '-')}")
+        # 자기 개발 대기 중인지 표시
+        training_flag = ""
+        training_queue = AGENTS_DIR / p['name'] / "training_queue.json"
+        if training_queue.exists():
+            training_flag = " [학습 대기중]"
+        print(f"  {p['name']:8} | 업무 {p.get('total_tasks', 0):3}건 | 평점 {avg} | 최근 활동: {p.get('last_active', '-')}{training_flag}")
     print("="*50)
+
+
+# ──────────────────────────────────────────────
+# 자기 개발 시스템 (#5b)
+# ──────────────────────────────────────────────
+
+def _queue_self_training(name: str, task: str, feedback: str):
+    """낮은 평점 피드백 시 자기 개발 큐에 추가."""
+    agent_dir = AGENTS_DIR / name
+    agent_dir.mkdir(exist_ok=True)
+
+    queue_path = agent_dir / "training_queue.json"
+    queue = []
+    if queue_path.exists():
+        with open(queue_path, encoding="utf-8") as f:
+            queue = json.load(f)
+
+    queue.append({
+        "date": datetime.now().strftime("%Y-%m-%d"),
+        "weak_area": task[:100],
+        "reason": feedback[:200],
+        "learned": False,
+    })
+    with open(queue_path, "w", encoding="utf-8") as f:
+        json.dump(queue, f, ensure_ascii=False, indent=2)
+
+
+def run_self_training(name: str) -> str:
+    """
+    자기 개발 실행 — Perplexity로 부족한 분야 학습.
+    낮은 평점 받은 업무 분야를 자동으로 리서치해서 training/ 폴더에 저장.
+
+    반환: 학습 완료 메시지 or 학습할 것 없음
+    """
+    agent_dir = AGENTS_DIR / name
+    queue_path = agent_dir / "training_queue.json"
+
+    if not queue_path.exists():
+        return f"{name}: 학습 큐가 비어있어. (낮은 평점 피드백이 없음)"
+
+    with open(queue_path, encoding="utf-8") as f:
+        queue = json.load(f)
+
+    unlearned = [item for item in queue if not item.get("learned")]
+    if not unlearned:
+        return f"{name}: 모든 학습 항목 완료됨."
+
+    # Perplexity로 학습
+    import os
+    from openai import OpenAI
+
+    perplexity_key = os.getenv("PERPLEXITY_API_KEY")
+    if not perplexity_key:
+        return f"{name}: PERPLEXITY_API_KEY 없음. 학습 스킵."
+
+    training_dir = agent_dir / "training"
+    training_dir.mkdir(exist_ok=True)
+
+    perplexity = OpenAI(
+        api_key=perplexity_key,
+        base_url="https://api.perplexity.ai",
+        timeout=60.0,
+    )
+
+    results = []
+    for item in unlearned:
+        weak_area = item["weak_area"]
+        reason = item["reason"]
+
+        print(f"\n[{name}] 자기 개발: '{weak_area[:50]}' 분야 학습 중...")
+
+        query = f"""
+다음 업무 분야에서 전문가 수준의 핵심 지식을 알려줘:
+
+업무: {weak_area}
+부족했던 이유: {reason}
+
+핵심 베스트 프랙티스, 주의할 점, 실제 예시 중심으로 정리해줘.
+한국어로 답해줘.
+"""
+        try:
+            response = perplexity.chat.completions.create(
+                model="sonar-pro",
+                messages=[
+                    {"role": "system", "content": "너는 세계 최고 수준의 전문가야. 핵심만 간결하게 가르쳐줘."},
+                    {"role": "user", "content": query}
+                ],
+                max_tokens=1500,
+            )
+            learned_content = response.choices[0].message.content
+
+            # 학습 내용 저장
+            safe_name = weak_area[:30].replace("/", "_").replace(" ", "_")
+            training_file = training_dir / f"{datetime.now().strftime('%Y%m%d')}_{safe_name}.md"
+            with open(training_file, "w", encoding="utf-8") as f:
+                f.write(f"# 자기 개발: {weak_area}\n\n")
+                f.write(f"**학습 계기**: {reason}\n\n")
+                f.write(f"**학습 일자**: {datetime.now().strftime('%Y-%m-%d')}\n\n")
+                f.write("---\n\n")
+                f.write(learned_content)
+
+            item["learned"] = True
+            item["learned_at"] = datetime.now().strftime("%Y-%m-%d")
+            results.append(f"완료: {weak_area[:50]}")
+            print(f"  -> 저장: {training_file.name}")
+
+        except Exception as e:
+            results.append(f"실패: {weak_area[:50]} ({e})")
+
+    # 큐 업데이트
+    with open(queue_path, "w", encoding="utf-8") as f:
+        json.dump(queue, f, ensure_ascii=False, indent=2)
+
+    return f"{name} 자기 개발 완료:\n" + "\n".join(f"  - {r}" for r in results)
+
+
+def load_training_knowledge(name: str) -> str:
+    """자기 개발로 학습한 내용을 프롬프트에 주입할 텍스트로 반환."""
+    training_dir = AGENTS_DIR / name / "training"
+    if not training_dir.exists():
+        return ""
+
+    files = sorted(training_dir.glob("*.md"), key=lambda f: f.stat().st_mtime, reverse=True)
+    if not files:
+        return ""
+
+    # 최근 3개 학습 내용만
+    recent = files[:3]
+    contents = []
+    for f in recent:
+        with open(f, encoding="utf-8") as fp:
+            content = fp.read()
+        # 첫 500자만 요약
+        contents.append(content[:500])
+
+    return "[자기 개발 학습 내용]\n" + "\n---\n".join(contents)
