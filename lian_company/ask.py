@@ -13,6 +13,9 @@
   ./venv/Scripts/python.exe ask.py --feedback "서윤" "4" "이번 조사 좋았어"
 성과 조회:
   ./venv/Scripts/python.exe ask.py --performance
+자기 개발 실행:
+  ./venv/Scripts/python.exe ask.py --train "서윤"
+  ./venv/Scripts/python.exe ask.py --train all
 """
 
 import sys
