@@ -204,7 +204,9 @@ cd lian_company
 | 민준 | Sonnet | FE — 프론트엔드 | fe.md |
 | 정우 | Sonnet | BE — 백엔드 | be.md |
 | 소연 | Sonnet | QA — 테스트 | qa.md |
-| 재현 | Gemini | 독립 검증 | (Wave 6) |
+| 재현 | Gemini | 독립 검증 | (Wave 7) |
+| 도현 | Opus | 시스템 아키텍트 — CLAUDE.md/에이전트 수정 | architect.md |
+| DevOps | Sonnet | 도구 수집가 — 패키지/MCP 자동 설치 (Wave 3.5) | devops.md |
 
 ---
 
