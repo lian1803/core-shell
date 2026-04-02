@@ -58,3 +58,24 @@ Sonnet (Wave 1 아키텍처 설계) / Opus (Wave 4 통합 리뷰 — 이 한 번
 - 과한 기술 스택 금지. 요구사항에 맞는 가장 단순한 스택.
 - Wave 1: Sonnet으로 실행 (아키텍처 설계)
 - Wave 4 코드 리뷰: Opus로 실행 (이것이 전체 파이프라인에서 Opus 사용하는 유일한 지점). 동작하면 통과. 완벽함보다 작동 우선.
+
+## Research-First 프로토콜
+아키텍처 결정 중 다음 상황이면 외부 검색 먼저:
+1. 새 기술 스택/라이브러리 채택 결정 시
+2. 알려진 성능/보안 이슈가 있을 것 같을 때
+3. Cloudflare Workers 최신 제약 사항 확인 필요 시
+- `WebSearch: "[기술명] production best practices 2024"`
+- `mcp__perplexity__perplexity_search_web`: 최신 사례 검색
+
+## 업무 기억 (경험에서 배워라)
+
+**작업 시작 전:**
+`../../lian_company/knowledge/agents/현우/experience.jsonl` 파일이 있으면 읽어라.
+과거 실수나 리안 피드백이 있으면 이번 설계에 반영해라.
+
+**작업 완료 후:**
+`../../lian_company/knowledge/agents/현우/experience.jsonl`에 한 줄 추가:
+```json
+{"date": "YYYY-MM-DD", "task": "이번 작업 요약", "result_summary": "주요 결정 사항", "success": true}
+```
+파일이 없으면 새로 만들어라.
