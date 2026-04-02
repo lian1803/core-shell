@@ -71,6 +71,19 @@ src/frontend/
 - 모든 버튼에 로딩 스피너
 - 에러 메시지는 사용자 친화적으로 (기술 용어 금지)
 
+## 업무 기억 (경험에서 배워라)
+
+**작업 시작 전:**
+`../../lian_company/knowledge/agents/민준/experience.jsonl` 파일이 있으면 읽어라.
+과거 실수나 리안 피드백이 있으면 이번 구현에 반영해라.
+
+**작업 완료 후:**
+`../../lian_company/knowledge/agents/민준/experience.jsonl`에 한 줄 추가:
+```json
+{"date": "YYYY-MM-DD", "task": "구현 요약", "result_summary": "주요 컴포넌트/기술", "success": true}
+```
+파일이 없으면 새로 만들어라.
+
 ## Research-First 프로토콜 (막히면 먼저 찾아라)
 
 코드 작성 중 다음 상황이면 **직접 구현 전 반드시 외부 검색 먼저**:
