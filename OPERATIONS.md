@@ -1,0 +1,378 @@
+# 리안 컴퍼니 운영 매뉴얼
+
+> 이 문서는 Claude가 자율적으로 시스템을 운영하기 위한 완전한 매뉴얼이다.
+> 리안이 "이거 해줘"라고 하면 이 문서를 보고 어떤 플로우를 태울지 스스로 판단해라.
+> 마지막 업데이트: 2026-04-02
+
+---
+
+## 0. 이 시스템이 뭐냐
+
+아이디어 하나 → AI 에이전트들이 자동으로 기획→팀 생성→실행→개발→마케팅까지.
+리안(CEO, 비개발자)의 개입을 최소화하는 것이 핵심 설계 원칙.
+
+**두 개의 엔진:**
+- **리안 컴퍼니** (`lian_company/`) = 기획 엔진. 아이디어 평가 + 팀 설계 + 지식 주입.
+- **UltraProduct** (`.claude/commands/work.md`) = 실행 엔진. 코드 개발 + 배포 + 마케팅.
+
+---
+
+## 1. 할 수 있는 것 전체 목록
+
+리안이 뭘 시키면 아래에서 해당하는 걸 골라서 실행해라.
+
+### 1-A. 새 아이디어 평가
+```
+"이거 될까?" / "아이디어 하나 있는데" / "시장조사 해줘"
+→ 이사팀 파이프라인
+→ python lian_company/main.py "아이디어"
+```
+- 시은이 아이디어 명확화 대화
+- 태호+서윤 병렬로 트렌드+시장조사
+- 민수 전략 수립 (GPT-4o)
+- 하은 팩트 검증 (Gemini)
+- 민수-하은 토론 + 시은 분석
+- 준혁 GO/NO-GO 최종 판단 (Opus)
+- GO → 시은이 팀 설계 → 교육팀 호출
+
+### 1-B. 새 팀 만들기
+```
+"OO팀 만들어" / "이 일 할 팀 필요해"
+→ 교육팀
+→ python lian_company/build_team.py "팀이름" "팀 목적 상세 설명"
+```
+**⚠️ 새 팀은 반드시 이 명령어로 만들어야 한다. 수동으로 .py 파일 직접 만들지 마라.**
+
+교육팀이 하는 일:
+1. 기존 knowledge/ 확인
+2. Opus가 커리큘럼 설계 (에이전트 구성 + 필요 지식 쿼리 설계)
+3. Perplexity가 쿼리 병렬 수집 (세계 최고 수준 전문 지식)
+4. 수집된 지식을 knowledge/base/에 저장
+5. 자동 생성:
+   - `lian_company/teams/{팀명}/` — 에이전트 .py + pipeline.py
+   - `lian_company/run_{팀명}.py` — 실행 진입점
+   - `.claude/agents/{에이전트}.md` — Claude Code 에이전트 정의
+   - `회사 조직도.md` — 자동 업데이트
+
+**팀 목적은 최대한 상세하게 쓸수록 좋다.** 기획서가 있으면 기획서 내용을 요약해서 넘겨라.
+
+### 1-C. 기존 팀 실행
+```
+"오프라인 영업 자료 만들어" / "영업 스크립트 새로 뽑아줘"
+→ python lian_company/offline_sales.py "업종"
+```
+```
+"자료 분석해줘" / (자료들/ 폴더에 파일 있으면)
+→ python lian_company/process_inbox.py
+```
+```
+교육팀이 만든 팀 실행:
+→ python lian_company/run_{팀명}.py "업무 내용"
+```
+
+### 1-D. 코드 개발 (UltraProduct)
+```
+"이거 만들어줘" / "개발해줘" / "앱 만들어" / "사이트 만들어"
+→ team/{프로젝트}/ 폴더에서 /work 실행
+```
+Wave 3부터 시작 (Wave 1-2 기획은 이미 완료된 상태):
+- CTO + CDO 병렬 설계
+- PM 태스크 분해
+- 🔴 리안 컨펌
+- FE + BE 병렬 개발
+- QA 테스트
+- 배포 (상용화만)
+- Gemini 독립 검증
+
+**전제조건:** 해당 폴더에 CLAUDE.md + PRD.md 있어야 함.
+
+### 1-E. 자료 처리
+```
+리안이 자료들/ 폴더에 파일 던져넣으면:
+→ python lian_company/process_inbox.py
+```
+- .txt .md .html → 도윤이 읽고 knowledge/base/ 저장 + 원본 삭제
+- .png .jpg .webp .gif .bmp → 분석팀(Gemini) 이미지 분석
+- .mp4 .mov .avi .mkv .webm → 분석팀(Gemini) 영상 분석
+- .pdf → 현재 스킵 (pdfplumber 미설치)
+- 처리 완료 → 보고사항들.md에 자동 보고
+
+### 1-F. 네이버 진단 도구 (오프라인 마케팅)
+```
+"진단 돌려줘" / "네이버 플레이스 분석" / "PPT 만들어"
+→ team/[진행중] 오프라인 마케팅/소상공인_영업툴/naver-diagnosis/
+→ python main.py (또는 uvicorn main:app --reload)
+→ http://localhost:8000
+```
+- 소상공인 검색 → 네이버 플레이스 크롤링 → 7개 항목 점수화 → A~D 등급
+- 자동 생성: 7슬라이드 PPT + 4단계 영업 메시지
+- 배치 처리 (엑셀 업로드) 가능
+
+---
+
+## 2. 직원 목록 (에이전트)
+
+### 이사팀 (lian_company/agents/)
+| 이름 | AI | 역할 | 파일 |
+|------|-----|------|------|
+| 시은 | Claude Sonnet | 오케스트레이터, 아이디어 명확화, 인터뷰, 팀 설계 | sieun.py |
+| 태호 | Claude Haiku | 트렌드 스카우팅 | taeho.py |
+| 서윤 | Perplexity | 실시간 시장조사, 지식 수집 | seoyun.py |
+| 민수 | GPT-4o | 전략/수익모델 | minsu.py |
+| 하은 | Gemini | 팩트 검증/반론 | haeun.py |
+| 준혁 | Claude Opus | GO/NO-GO 최종 판단 | junhyeok.py |
+
+### 교육팀 (lian_company/teams/education/)
+| 이름 | AI | 역할 | 파일 |
+|------|-----|------|------|
+| 도윤 | Claude Opus | 커리큘럼 설계 | curriculum_designer.py |
+| 서윤 | Perplexity | 전문 지식 수집 (겸직) | trainer.py |
+
+### 분석·마케팅팀 (lian_company/teams/)
+| 이름 | AI | 역할 | 파일 |
+|------|-----|------|------|
+| 지수 | Gemini Vision | 이미지/영상 분석 | analysis/analyzer.py |
+| 재원 | Perplexity | 영업 자료 수집 (오프라인) | offline_marketing/researcher.py |
+| 승현 | Claude Sonnet | 영업 전략 설계 (오프라인) | offline_marketing/strategist.py |
+| 예진 | Claude Sonnet | DM/스크립트/카피 (오프라인) | offline_marketing/copywriter.py |
+
+### UltraProduct 팀 (.claude/agents/)
+| 이름 | AI | 역할 | 파일 |
+|------|-----|------|------|
+| 현우 | Sonnet | CTO — 기술 아키텍처 | cto.md |
+| 나은 | Sonnet | CDO — Stitch 디자인 | cdo.md |
+| 유진 | Haiku | PM — 태스크 분해 | pm.md |
+| 민준 | Sonnet | FE — 프론트엔드 | fe.md |
+| 정우 | Sonnet | BE — 백엔드 | be.md |
+| 소연 | Sonnet | QA — 테스트 | qa.md |
+| 재현 | Gemini | 독립 검증 | (Wave 6) |
+
+---
+
+## 3. 의사결정 트리 — 리안이 뭘 시키면 어떻게 하냐
+
+```
+리안의 요청
+    │
+    ├─ "아이디어 평가해줘" / "이거 될까?"
+    │   → 1-A. python main.py "아이디어"
+    │
+    ├─ "OO팀 만들어" / "이 일 할 사람 필요해"
+    │   → 1-B. 기획서 작성 → python build_team.py
+    │   ⚠️ 절대 수동으로 팀 코드 작성하지 마라
+    │
+    ├─ "개발해줘" / "사이트 만들어" / "앱 만들어"
+    │   → 1-D. 해당 team/ 폴더에서 /work
+    │   → PRD.md 없으면 먼저 1-A 또는 기획 필요
+    │
+    ├─ "영업 자료 만들어" / "스크립트 뽑아줘"
+    │   → 1-C. 해당 팀 파이프라인 실행
+    │
+    ├─ "이 자료 분석해" / (자료들/ 폴더에 뭔가 있을 때)
+    │   → 1-E. python process_inbox.py
+    │
+    ├─ "네이버 진단" / "PPT" / "소상공인 분석"
+    │   → 1-F. naver-diagnosis 실행
+    │
+    ├─ "조직 변경" / "팀원 추가/삭제" / "모델 변경"
+    │   → 회사 조직도.md + zip/src/App.tsx 동시 수정 + 빌드 배포
+    │
+    └─ 기타
+        → CLAUDE.md 규칙에 따라 판단
+        → 모르겠으면 리안에게 물어봐라
+```
+
+---
+
+## 4. 지식 시스템
+
+### 구조
+```
+knowledge/
+├── manager.py       ← API (저장/검색/피드백/보고)
+├── index.json       ← 전체 인덱스
+├── base/            ← 공유 지식 (7개 문서, ~450KB)
+│   ├── AI기초_비즈니스활용.md
+│   ├── AI툴심화_자기강화루프.md
+│   ├── UX_설계원칙_완전판.md
+│   ├── 린스타트업_방법론_완전판.md
+│   ├── 마케팅퍼널_완전가이드.md
+│   ├── 서비스기획_원칙_완전판.md
+│   └── 프로토타이핑_IA_UJ_PRD_가이드.md
+├── teams/           ← 팀별 결과물 + 피드백
+└── trends/          ← ❌ 미구현
+```
+
+### 지식 흐름
+1. 교육팀이 Perplexity로 수집 → `knowledge/base/`에 저장
+2. 팀 실행 결과물 → `knowledge/teams/{팀명}/`에 저장
+3. 리안 피드백 → `knowledge/teams/{팀명}/feedback/`에 저장
+4. 새 팀 생성 시 → 관련 지식 자동 검색 → 에이전트 프롬프트에 주입
+
+### 사용 가능한 API (knowledge/manager.py)
+```python
+from knowledge.manager import (
+    save_base_knowledge,      # 공유 지식 저장
+    save_team_result,         # 팀 결과물 저장
+    save_feedback,            # 피드백 저장
+    get_knowledge_for_team,   # 팀 관련 지식 검색
+    write_report,             # 보고사항들.md에 보고
+    collect_feedback,         # 리안 피드백 수집
+)
+```
+
+---
+
+## 5. 실행 환경
+
+### API 키 (.env)
+```
+위치: lian_company/.env
+상태: ✅ 전부 설정됨 (2026-04-01 확인)
+
+ANTHROPIC_API_KEY    → Claude 모델 전체
+OPENAI_API_KEY       → GPT-4o (민수)
+GOOGLE_API_KEY       → Gemini (하은, 도윤, 지수)
+PERPLEXITY_API_KEY   → Perplexity (서윤, 재원)
+DISCORD_WEBHOOK_URL  → 디스코드 알림 (선택)
+```
+
+### Python 실행
+```bash
+# lian_company 내 모든 스크립트:
+cd lian_company
+./venv/Scripts/python.exe {스크립트}.py
+
+# naver-diagnosis:
+cd team/[진행중]\ 오프라인\ 마케팅/소상공인_영업툴/naver-diagnosis/
+./venv/Scripts/python.exe main.py
+```
+
+### 모델 상수 (core/models.py)
+```python
+CLAUDE_OPUS   = "claude-opus-4-6"
+CLAUDE_SONNET = "claude-sonnet-4-6"
+CLAUDE_HAIKU  = "claude-haiku-4-5-20251001"
+GEMINI_FLASH  = "gemini-2.5-flash"
+GEMINI_PRO    = "gemini-2.5-pro"
+GPT4O         = "gpt-4o"
+SONAR_PRO     = "sonar-pro"
+```
+→ 모델 변경 시 여기만 수정하면 전체 반영.
+
+### 자동 Git Hook
+```
+.claude/settings.json에 설정됨:
+파일 Edit/Write 할 때마다 → git add -A → git commit → git push
+```
+
+---
+
+## 6. 프로젝트 현황
+
+| 프로젝트 | 위치 | 상태 |
+|----------|------|------|
+| 오프라인 마케팅 | `team/[진행중] 오프라인 마케팅/` | ✅ 진행중 (naver-diagnosis 운영중) |
+| 온라인 마케팅 | `team/온라인 마케팅/` | 📝 기획서 작성 완료, 교육팀 투입 전 |
+| 혜경님 인하우스 마케터 | `team/[혜경님] 인하우스_마케터_및_프리랜서를_위한/` | 📋 진행중 |
+| 고객-마케터 플랫폼 | `team/[중단] 고객이랑 마케터랑 이어주는 플랫폼/` | ⏸️ 중단 |
+| 구매대행 자동화 | `team/[중단] 구매대행 자동화/` | ⏸️ 중단 |
+| 백로그 | `team/[중단] 나중에 할것들(지금 할거 아님)/` | ⏸️ 대기 |
+
+---
+
+## 7. 새 팀 만드는 전체 플로우 (상세)
+
+이건 가장 중요한 플로우이므로 상세하게 기록한다.
+
+### Step 1: 기획서 작성
+- 리안이 "OO팀 만들어"라고 하면
+- Claude가 먼저 Perplexity로 해당 도메인 조사
+- 조사 결과를 바탕으로 `team/{팀명}/기획서.md` 작성
+- 리안 검토 + 수정
+
+### Step 2: 교육팀 실행
+```bash
+cd lian_company
+./venv/Scripts/python.exe build_team.py "팀이름" "팀 목적 (기획서 요약)"
+```
+- 팀 목적은 기획서 핵심을 요약한 텍스트. 길수록 좋다.
+- Opus가 에이전트 구성 + 지식 쿼리 설계
+- Perplexity가 지식 수집
+- 코드 자동 생성
+
+### Step 3: 자동 생성 결과물
+```
+lian_company/teams/{팀명}/
+├── __init__.py
+├── pipeline.py           ← 팀 실행 로직
+├── {에이전트1}.py        ← 지식 주입된 에이전트
+├── {에이전트2}.py
+└── ...
+
+lian_company/run_{팀명}.py   ← 실행 진입점
+.claude/agents/{에이전트}.md  ← Claude Code 에이전트 정의
+회사 조직도.md               ← 자동 업데이트됨
+```
+
+### Step 4: 팀 실행
+```bash
+cd lian_company
+./venv/Scripts/python.exe run_{팀명}.py "업무 내용"
+```
+- 팀 인터뷰 (리안한테 질문)
+- 에이전트 순차 실행
+- 결과물 `team/{팀명}/`에 저장
+- 보고사항들.md에 자동 보고
+- 리안 피드백 수집
+
+---
+
+## 8. 슬래시 커맨드
+
+| 명령어 | 기능 | 위치 |
+|--------|------|------|
+| `/work` | UltraProduct Wave 3-6 실행 | .claude/commands/work.md |
+| `/setup` | 첫 설치 세팅 | .claude/commands/setup.md |
+| `/save` | 세션 저장 | .claude/commands/save.md |
+| `/shell` | /work와 동일 | .claude/commands/shell.md |
+| `/brand-guidelines` | 브랜드 가이드라인 | .claude/commands/brand-guidelines.md |
+| `/frontend-design` | 컴포넌트 구조 설계 | .claude/commands/frontend-design.md |
+| `/theme-factory` | 컬러+폰트 확정 | .claude/commands/theme-factory.md |
+
+---
+
+## 9. 법적 제한 (마케팅 관련)
+
+이 시스템으로 마케팅 팀을 만들 때 반드시 지켜야 할 법률:
+
+| 항목 | 제한 | 안전한 대안 |
+|------|------|-------------|
+| 콜드 이메일 | 수신동의 없는 광고 메일 = 과태료 3천만원 (정보통신망법 50조) | 명함 교환 후 6개월 내만 / 정보 제공 형태 |
+| 네이버 크롤링 | DB권 침해 + 개인정보보호법 위반 위험 | 수동 검색만, 자동 스크래핑 금지 |
+| 인스타 DM 자동화 | 비공식 봇 = 계정 정지 | Manychat/소셜비즈 등 메타 공식 파트너만 |
+| 카카오톡 | 스팸 발송 = 통신규제 위반 | 카카오 비즈메시지(채널 친구)만 |
+| 블로그 자동 포스팅 | 네이버 API 없음, Selenium = 약관 위반 | AI 작성 + 수동 업로드 |
+
+---
+
+## 10. 트러블슈팅
+
+| 문제 | 원인 | 해결 |
+|------|------|------|
+| main.py 실행 안 됨 | .env 없거나 키 오류 | lian_company/.env 확인 |
+| Perplexity 에러 | API 키 만료 or 한도 | PERPLEXITY_API_KEY 확인 |
+| 교육팀 생성 실패 | Opus 호출 실패 | ANTHROPIC_API_KEY 확인 + 잔액 |
+| naver-diagnosis 크롤링 실패 | Playwright 브라우저 없음 | `playwright install chromium` |
+| Git push 실패 | 원격 연결 안 됨 | `git remote -v` 확인 |
+| knowledge/base/ 비어있음 | 교육팀 미실행 | process_inbox.py 또는 build_team.py 실행 |
+
+---
+
+## 11. 이 문서 관리 규칙
+
+- 새 팀이 생기면 → 2번(직원 목록) + 6번(프로젝트 현황) 업데이트
+- 새 명령어가 생기면 → 1번(할 수 있는 것) + 8번(슬래시 커맨드) 업데이트
+- 새 파이프라인이 생기면 → 3번(의사결정 트리) 업데이트
+- 법적 제한 변경 → 9번 업데이트
+- **이 문서가 코드와 불일치하면 → 코드가 진실, 문서를 수정해라**
