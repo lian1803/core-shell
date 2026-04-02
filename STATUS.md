@@ -34,17 +34,22 @@
 - 온라인 마케팅팀 교육팀으로 생성 (`build_team.py`)
 - naver-diagnosis 실제 서버 테스트
 
-**변경된 파일:**
+**변경된 파일 (Phase 1+2+3+4 전체):**
 | 파일 | 변경 |
 |------|------|
-| `lian_company/ask.py` | 신규 생성 |
-| `lian_company/knowledge/agent_memory.py` | 신규 생성 |
+| `lian_company/ask.py` | 신규 생성 (개별 호출 + 피드백 + 성과 + 자기 개발) |
+| `lian_company/knowledge/agent_memory.py` | 신규 생성 (경험/피드백/성과/자기 개발 전체) |
 | `.claude/agents/fe.md` | Research-First + 업무 기억 |
 | `.claude/agents/be.md` | Research-First + 업무 기억 |
 | `.claude/agents/qa.md` | Research-First + 업무 기억 |
 | `.claude/agents/cto.md` | Research-First + 업무 기억 |
 | `.claude/agents/cdo.md` | 업무 기억 |
-| `OPERATIONS.md` | 1-G 직원 개별 호출 섹션 추가 |
+| `.claude/agents/architect.md` | 신규 생성 (도현, 시스템 아키텍트) |
+| `.claude/agents/devops.md` | 신규 생성 (Wave 3.5 도구 수집가) |
+| `.claude/commands/shell.md` | Wave 3.5 DevOps 추가 |
+| `.claude/commands/work.md` | Wave 3.5 DevOps 추가 |
+| `CLAUDE.md` | 직원 성장 + 도현 아키텍트 규칙 추가 |
+| `OPERATIONS.md` | 1-G 직원 개별 호출 + 1-H 아키텍트 + 성장 명령어 |
 
 ---
 
