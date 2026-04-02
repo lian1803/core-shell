@@ -187,8 +187,13 @@ def main():
     # 실행
     print(f"\n{'='*60}")
     print(f"직접 호출: {name_input} ({module_name})")
-    if memory:
-        print(f"[경험 로드됨 — 과거 기록 반영]")
+    if full_context:
+        flags = []
+        if memory:
+            flags.append("경험")
+        if training:
+            flags.append("자기 개발 학습")
+        print(f"[{' + '.join(flags)} 로드됨]")
     print(f"업무: {task}")
     print(f"{'='*60}")
 
