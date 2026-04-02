@@ -167,6 +167,17 @@ def run_pipeline(sieun_result: dict) -> None:
 
     notify_execution_start()
 
+    # ── 시은: 큰그림 체크 (GO 확정 직후) ────────────────────────────
+    print(f"\n[5.5/9] 큰그림 체크 (시은)...")
+    try:
+        big_picture = sieun.big_picture_check(context, client)
+        context["big_picture"] = big_picture
+        save_file(output_dir, "04b_큰그림체크_시은.md", big_picture)
+        print_save_ok("04b_큰그림체크_시은.md")
+    except Exception as e:
+        print(f"\n⚠️  큰그림 체크 에러 (건너뜀): {e}")
+        context["big_picture"] = ""
+
     # ── 지훈: PRD 작성 ────────────────────────────────────────────
 
     print(f"\n[6/9] PRD 작성 (지훈)...")
