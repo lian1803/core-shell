@@ -207,6 +207,7 @@ cd lian_company
 | 재현 | Gemini | 독립 검증 | (Wave 7) |
 | 도현 | Opus | 시스템 아키텍트 — CLAUDE.md/에이전트 수정 | architect.md |
 | DevOps | Sonnet | 도구 수집가 — 패키지/MCP 자동 설치 (Wave 3.5) | devops.md |
+| 지호 | Opus | 참모(CoS) — 전체 프로젝트 갭 분석, 빠진 것 찾기 | coos.md |
 
 ---
 
