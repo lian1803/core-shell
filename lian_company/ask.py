@@ -72,12 +72,12 @@ def main():
     if len(sys.argv) < 3:
         print("사용법: ask.py '직원이름' '업무내용'")
         print("\n호출 가능한 직원:")
-        print("  서윤  — 시장조사 (Perplexity)")
-        print("  민수  — 전략/수익모델 (GPT-4o)")
-        print("  하은  — 팩트체크/검증 (Gemini)")
-        print("  준혁  — GO/NO-GO 판단 (Claude Opus)")
-        print("  태호  — 트렌드 분석 (Claude Haiku)")
-        print("  시은  — 아이디어 명확화 (Claude Sonnet)")
+        print("  서윤  : 시장조사 (Perplexity)")
+        print("  민수  : 전략/수익모델 (GPT-4o)")
+        print("  하은  : 팩트체크/검증 (Gemini)")
+        print("  준혁  : GO/NO-GO 판단 (Claude Opus)")
+        print("  태호  : 트렌드 분석 (Claude Haiku)")
+        print("  시은  : 아이디어 명확화 (Claude Sonnet)")
         sys.exit(1)
 
     name_input = sys.argv[1].strip().lower()
