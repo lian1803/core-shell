@@ -245,6 +245,10 @@ cd lian_company
     ├─ "시스템 바꿔줘" / "에이전트 수정해줘" / "플로우 업그레이드해줘"
     │   → 1-H. 도현(아키텍트) 호출 → Agent(subagent_type="architect")
     │
+    ├─ "전체 상황 봐줘" / "뭐 빠진 거 없어?" / "지호야 체크해줘"
+    │   → 1-I. 지호(참모) 호출 → Agent(subagent_type="coos")
+    │       또는 python lian_company/watchdog.py
+    │
     └─ 기타
         → CLAUDE.md 규칙에 따라 판단
         → 모르겠으면 리안에게 물어봐라
