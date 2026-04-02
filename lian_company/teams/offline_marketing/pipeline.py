@@ -80,14 +80,15 @@ def run(industry: str = "소상공인 네이버 플레이스 마케팅 대행"):
         # 보고
         report_content = (
             f"**{industry}** 영업 자료 완성.\n\n"
-            f"- 재원: 영업 전문가 자료 수집 완료 (SPIN/Challenger 기반)\n"
-            f"- 승현: 영업 전략 재설계 완료\n"
-            f"- 예진: DM 스크립트 + PPT 카피 완성\n\n"
+            f"- 재원: 영업 전문가 자료 수집 완료\n"
+            f"- 승현: 영업 전략 재설계 완료 (운영 7개 항목 포함)\n"
+            f"- 예진: DM 스크립트 + PPT 카피 완성\n"
+            f"- 검증자: 현장 관점 사업 검증 완료\n\n"
             f"저장 위치: `{OUTPUT_DIR}`\n\n"
-            f"리안, 스크립트 확인하고 실제 발송 전에 한 번 봐줘. "
-            f"특히 업종별 변형 멘트 맞는지 체크 부탁해."
+            f"리안, **영업_사업검증.md 먼저 봐줘.** "
+            f"영업 시작 전에 고쳐야 할 것들 정리되어 있어."
         )
-        write_report("재원/승현/예진", "오프라인 마케팅팀", report_content)
+        write_report("재원/승현/예진/검증자", "오프라인 마케팅팀", report_content)
 
         # 피드백 수집
         collect_feedback("offline_marketing")
