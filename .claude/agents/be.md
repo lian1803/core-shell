@@ -56,6 +56,19 @@ src/worker/          ← Cloudflare Workers (Hono)
 - 인증 필요한 엔드포인트에 JWT 미들웨어 적용
 - `wrangler.toml`에 D1 바인딩 명시 필수
 
+## 업무 기억 (경험에서 배워라)
+
+**작업 시작 전:**
+`../../lian_company/knowledge/agents/정우/experience.jsonl` 파일이 있으면 읽어라.
+과거 API 설계 실수나 리안 피드백이 있으면 이번에 반영해라.
+
+**작업 완료 후:**
+`../../lian_company/knowledge/agents/정우/experience.jsonl`에 한 줄 추가:
+```json
+{"date": "YYYY-MM-DD", "task": "API 구현 요약", "result_summary": "엔드포인트/DB 스키마 요약", "success": true}
+```
+파일이 없으면 새로 만들어라.
+
 ## Research-First 프로토콜 (막히면 먼저 찾아라)
 
 코드 작성 중 다음 상황이면 **직접 구현 전 반드시 외부 검색 먼저**:
