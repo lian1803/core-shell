@@ -89,13 +89,31 @@ def resolve_name(name_input: str) -> str | None:
 
 def main():
     from knowledge.agent_memory import (
-        load_agent_memory, save_work_log,
-        save_feedback, record_task_start, print_performance_report
+        load_agent_memory, load_training_knowledge,
+        save_work_log, save_feedback,
+        record_task_start, print_performance_report,
+        run_self_training,
     )
 
     # 성과 조회 모드
     if len(sys.argv) >= 2 and sys.argv[1] == "--performance":
         print_performance_report()
+        return
+
+    # 자기 개발 모드: ask.py --train "이름" 또는 ask.py --train all
+    if len(sys.argv) >= 2 and sys.argv[1] == "--train":
+        target = sys.argv[2] if len(sys.argv) >= 3 else "all"
+        if target == "all":
+            for name in set(NAME_MAP.values()):
+                # 모듈명→한국어 이름 역매핑
+                kr_names = [k for k, v in NAME_MAP.items() if v == name and len(k) <= 3]
+                kr_name = kr_names[0] if kr_names else name
+                result = run_self_training(kr_name)
+                if "학습 큐가 비어" not in result and "완료됨" not in result:
+                    print(result)
+        else:
+            result = run_self_training(target)
+            print(result)
         return
 
     # 피드백 모드: ask.py --feedback "서윤" "4" "이번 조사 좋았어"
