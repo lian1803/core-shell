@@ -38,14 +38,22 @@ if errorlevel 1 (
 echo [2/6] Python OK
 
 :: Claude Code install
+claude --version >nul 2>&1
+if not errorlevel 1 (
+    echo [3/6] Claude Code already installed - skip
+    goto :venv
+)
 echo [3/6] Installing Claude Code...
-call npm install -g @anthropic/claude-code >nul 2>&1
+call npm install -g @anthropic/claude-code
 if errorlevel 1 (
-    echo [ERROR] Claude Code install failed. Try running as Administrator.
+    echo.
+    echo [ERROR] Claude Code install failed.
+    echo         Try: npm install -g @anthropic/claude-code
     pause
     exit /b 1
 )
 echo       Done
+:venv
 
 :: venv + packages
 if not exist "!REPO_DIR!\lian_company\venv" (
