@@ -35,3 +35,14 @@ node_modules/
 
 # 로그
 *.log
+
+# 잡파일
+pip_err.txt
+pip_out.txt
+*.png
+lian_company/answers.txt
+lian_company/대화.txt
+lian_company/새 텍스트 문서.txt
+lian_company/TEST_RESULT_*.md
+lian_company/outputs/
+lian_company/knowledge/
