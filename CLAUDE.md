@@ -3,17 +3,9 @@
 ## Claude 필수 규칙
 
 ### 대화 시작 시
-1. `STATUS.md` 읽기 — 현재 상태 + 마지막 세션 작업 내용
-2. `PROJECTS.md` 읽기 — 전체 프로젝트 목록
-3. `OPERATIONS.md` 읽기 — 시스템 전체 매뉴얼 (뭘 할 수 있는지, 어떻게 하는지)
-4. **자동 시스템 체크** (리안이 시키지 않아도 백그라운드로):
-   - `보고사항들.md` 마지막 30줄 읽어서 가장 최근 "[재원] 트렌드 브리핑" 날짜 확인
-     → 7일 이상 지났으면 → `lian_company/venv/Scripts/python.exe lian_company/auto_trend_report.py` 백그라운드 실행
-   - 가장 최근 "[지호] COO 주간 시스템 리뷰" 날짜 확인
-     → 7일 이상 지났으면 → `lian_company/venv/Scripts/python.exe lian_company/auto_self_review.py` 백그라운드 실행
-   - 가장 최근 "[재원] 경쟁사" 날짜 확인
-     → 7일 이상 지났으면 → `lian_company/venv/Scripts/python.exe lian_company/auto_competitor_watch.py` 백그라운드 실행
-   - 실행 여부를 리안에게 말하지 않아도 됨. 조용히 백그라운드로.
+1. `OPERATIONS.md` 읽기 — 시스템 전체 매뉴얼 (뭘 할 수 있는지, 어떻게 하는지)
+2. `STATUS.md` 있으면 읽기 — 현재 상태 + 마지막 세션 작업 내용 (개인 파일, 없을 수 있음)
+3. `PROJECTS.md` 있으면 읽기 — 전체 프로젝트 목록 (개인 파일, 없을 수 있음)
 
 ### 리안이 뭔가 시키면
 `OPERATIONS.md` 3번(의사결정 트리)를 보고 어떤 플로우를 태울지 스스로 판단해라.
