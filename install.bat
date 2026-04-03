@@ -8,7 +8,13 @@ echo   리안 컴퍼니 설치 스크립트
 echo ============================================================
 echo.
 
-:: ── Node.js 확인 (Claude Code 설치용) ───────────────────────
+:: ── 현재 경로 감지 ───────────────────────────────────────────
+set "REPO_DIR=%~dp0"
+set "REPO_DIR=!REPO_DIR:~0,-1!"
+echo   설치 경로: !REPO_DIR!
+echo.
+
+:: ── Node.js 확인 ─────────────────────────────────────────────
 node --version >nul 2>&1
 if errorlevel 1 (
     echo [오류] Node.js가 없어.
@@ -17,7 +23,7 @@ if errorlevel 1 (
     pause
     exit /b 1
 )
-echo [1/6] Node.js 확인 완료
+echo [1/7] Node.js 확인 완료
 
 :: ── Python 확인 ──────────────────────────────────────────────
 python --version >nul 2>&1
@@ -29,10 +35,10 @@ if errorlevel 1 (
     pause
     exit /b 1
 )
-echo [2/6] Python 확인 완료
+echo [2/7] Python 확인 완료
 
 :: ── Claude Code 설치 ─────────────────────────────────────────
-echo [3/6] Claude Code 설치 중...
+echo [3/7] Claude Code 설치 중...
 call npm install -g @anthropic/claude-code >nul 2>&1
 if errorlevel 1 (
     echo [오류] Claude Code 설치 실패. 관리자 권한으로 다시 실행해봐.
@@ -42,35 +48,86 @@ if errorlevel 1 (
 echo       완료
 
 :: ── venv 생성 + 패키지 설치 ──────────────────────────────────
-if not exist "lian_company\venv" (
-    echo [4/6] 가상환경 생성 중...
-    python -m venv lian_company\venv
+if not exist "!REPO_DIR!\lian_company\venv" (
+    echo [4/7] 가상환경 생성 중...
+    python -m venv "!REPO_DIR!\lian_company\venv"
 ) else (
-    echo [4/6] 가상환경 이미 존재함 — 스킵
+    echo [4/7] 가상환경 이미 존재함 — 스킵
 )
 echo       패키지 설치 중...
-lian_company\venv\Scripts\python.exe -m pip install --upgrade pip -q
-lian_company\venv\Scripts\python.exe -m pip install -r lian_company\requirements.txt -q
+"!REPO_DIR!\lian_company\venv\Scripts\python.exe" -m pip install --upgrade pip -q
+"!REPO_DIR!\lian_company\venv\Scripts\python.exe" -m pip install -r "!REPO_DIR!\lian_company\requirements.txt" -q
+echo       완료
+
+:: ── 경로 자동 업데이트 ───────────────────────────────────────
+echo [5/7] 설정 파일 경로 업데이트 중...
+set "PYTHON_PATH=!REPO_DIR!\lian_company\venv\Scripts\python.exe"
+set "PYTHON_FWD=!PYTHON_PATH:\=/!"
+set "REPO_FWD=!REPO_DIR:\=/!"
+
+"!REPO_DIR!\lian_company\venv\Scripts\python.exe" -c "
+import re, sys
+
+repo = sys.argv[1]
+python = sys.argv[2]
+
+files = [
+    (r'!REPO_DIR!\.claude\settings.json', False),
+    (r'!REPO_DIR!\.claude\agents\architect.md', False),
+    (r'!REPO_DIR!\.claude\agents\coos.md', False),
+    (r'!REPO_DIR!\.claude\commands\save.md', False),
+    (r'!REPO_DIR!\.claude\commands\self-review.md', False),
+    (r'!REPO_DIR!\.claude\commands\trend.md', False),
+    (r'!REPO_DIR!\.agents\workflows\run-lian.md', False),
+]
+
+old_paths = [
+    r'C:/Users/hkyou/Documents/work_youns/core-shell',
+    r'C:\\Users\\hkyou\\Documents\\work_youns\\core-shell',
+    r'c:\\Users\\hkyou\\Documents\\work_youns\\core-shell',
+    r'c:/Users/hkyou/Documents/work_youns/core-shell',
+]
+
+for fpath, _ in files:
+    try:
+        with open(fpath, 'r', encoding='utf-8') as f:
+            content = f.read()
+        new_content = content
+        for old in old_paths:
+            new_slash = repo.replace(chr(92), '/')
+            old_slash = old.replace(chr(92), '/')
+            new_content = new_content.replace(old_slash, new_slash)
+            new_content = new_content.replace(old_slash.replace('/', chr(92)), repo)
+        if new_content != content:
+            with open(fpath, 'w', encoding='utf-8') as f:
+                f.write(new_content)
+            print(f'  업데이트: {fpath}')
+    except Exception as e:
+        print(f'  스킵: {fpath} ({e})')
+" "!REPO_DIR!" "!PYTHON_PATH!"
+
 echo       완료
 
 :: ── Claude Code 글로벌 설정 ──────────────────────────────────
-echo [5/6] Claude Code 기본 설정 중...
+echo [6/7] Claude Code 기본 설정 중...
 if not exist "%USERPROFILE%\.claude" mkdir "%USERPROFILE%\.claude"
 if not exist "%USERPROFILE%\.claude\settings.json" (
-    echo { > "%USERPROFILE%\.claude\settings.json"
-    echo   "skipDangerousModePermissionPrompt": true, >> "%USERPROFILE%\.claude\settings.json"
-    echo   "model": "sonnet" >> "%USERPROFILE%\.claude\settings.json"
-    echo } >> "%USERPROFILE%\.claude\settings.json"
+    (
+        echo {
+        echo   "skipDangerousModePermissionPrompt": true,
+        echo   "model": "sonnet"
+        echo }
+    ) > "%USERPROFILE%\.claude\settings.json"
     echo       완료
 ) else (
     echo       이미 설정됨 — 스킵
 )
 
 :: ── .env 파일 생성 ────────────────────────────────────────────
-echo [6/6] API 키 설정
+echo [7/7] API 키 설정
 echo.
 
-if exist "lian_company\.env" (
+if exist "!REPO_DIR!\lian_company\.env" (
     echo   .env 파일이 이미 있어. 덮어쓸까? (y/n, 기본값=n):
     set /p OVERWRITE=  선택:
     if /i not "!OVERWRITE!"=="y" goto :done
@@ -110,7 +167,7 @@ set /p DISCORD=  Discord Webhook URL (없으면 엔터):
     echo CF_PROJECT_NAME=
     echo PROJECT_URL=
     echo STITCH_API_KEY=
-) > lian_company\.env
+) > "!REPO_DIR!\lian_company\.env"
 
 echo.
 echo   .env 저장 완료
