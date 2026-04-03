@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"C:/Users/lian1/Documents/Work/core/.claude/hooks/pre_tool_safety.sh\"",
+            "command": "bash \"C:/Users/hkyou/Documents/work_youns/core-shell/.claude/hooks/pre_tool_safety.sh\"",
             "timeout": 10
           }
         ]
@@ -29,7 +29,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "jq -r '.tool_response.stdout // \"\"' | grep -q 'Aliased: https://lian-dash.vercel.app' && \"/c/Users/lian1/Documents/Work/core/lian_company/venv/Scripts/python.exe\" \"/c/Users/lian1/Documents/Work/core/lian_company/auto_visual_review.py\" > /dev/null 2>&1 & true",
+            "command": "jq -r '.tool_response.stdout // \"\"' | grep -q 'Aliased: https://lian-dash.vercel.app' && \"/c/Users/hkyou/Documents/work_youns/core-shell/lian_company/venv/Scripts/python.exe\" \"/c/Users/hkyou/Documents/work_youns/core-shell/lian_company/auto_visual_review.py\" > /dev/null 2>&1 & true",
             "timeout": 5,
             "async": true
           }

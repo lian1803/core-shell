@@ -24,6 +24,7 @@ load_dotenv()
 from agents import sieun
 from core.pipeline import run_pipeline, get_client
 from core.notifier import notify_pipeline_start
+from core.cost_estimator import confirm_proceed
 
 
 BANNER = """
@@ -61,7 +62,12 @@ def main():
     # 시은: 아이디어 명확화
     sieun_result = sieun.run(idea, client, interactive=interactive)
 
-    # 이사팀 자동 실행 (더 이상 확인 안 함)
+    # 예상 비용 안내 + 진행 확인
+    if not confirm_proceed():
+        print("\n취소됐어. 아이디어 수정 후 다시 실행해줘.")
+        sys.exit(0)
+
+    # 이사팀 자동 실행
     print(f"\n{'='*60}")
     print("이사팀 자동 실행 중...")
 

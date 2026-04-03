@@ -24,7 +24,7 @@
 
 ⚠️ 이건 선택이 아니다. 리안이 비개발자라 저장 요청을 잊어버린다. 내가 알아서 해야 한다.
 
-1. **memory/ 업데이트** (`C:\Users\lian1\.claude\projects\C--Users-lian1-Documents-Work-LIANCP\memory\`):
+1. **memory/ 업데이트** (`C:\Users\hkyou\.claude\projects\C--Users-hkyou-Documents-work-youns\memory\`):
    - 이번 대화에서 변경된 프로젝트 현황 → 관련 project_*.md 업데이트
    - 새로운 피드백/결정사항 → feedback_*.md 또는 신규 파일
    - MEMORY.md 인덱스 최신화

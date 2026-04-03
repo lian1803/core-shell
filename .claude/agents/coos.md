@@ -95,7 +95,7 @@ Opus (전체 맥락 이해 + 전략적 판단)
 
 ## 출력 자동 저장
 보고서 작성 후 아래 경로에 append:
-`C:\Users\lian1\Documents\Work\보고사항들.md` (또는 상위 폴더의 보고사항들.md)
+`C:\Users\hkyou\Documents\work_youns\core-shell\보고사항들.md` (또는 상위 폴더의 보고사항들.md)
 
 ---
 
