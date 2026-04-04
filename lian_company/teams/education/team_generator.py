@@ -221,7 +221,7 @@ def generate(curriculum: dict, agent_knowledge: dict, base_path: str):
     pipeline_code = PIPELINE_TEMPLATE.format(
         agent_imports=imports,
         team_display_name=team_name,
-        team_folder=team_name,
+        team_folder=team_name.replace("/", "_").replace("\\", "_"),
         team_slug=slug,
         pipeline_steps="\n".join(steps),
         interview_prompt=interview_prompt_str,
