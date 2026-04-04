@@ -120,6 +120,8 @@ def run(task: str = ""):
 
     # 자가점검
     try:
+        if self_critique_all is None:
+            raise Exception("self_critique_all 미로드")
         critique = self_critique_all(context, client, team_name="온라인마케팅팀")
         context["critique"] = critique
         save(output_dir, "_자가점검_결과.md", critique.get("full_critique", ""))
