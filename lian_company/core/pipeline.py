@@ -334,3 +334,9 @@ Go/No-Go: {context.get('verdict', '')} ({context.get('score', '')}점)"""
 
     # 디스코드 완료 알림
     notify_completion(output_dir, project_name)
+
+    # ── 시스템 자기 점검 ─────────────────────────────────────────
+    try:
+        post_run_review("이사팀 파이프라인", context)
+    except Exception as e:
+        print(f"\n⚠️ 자기 점검 에러 (무시): {e}")
