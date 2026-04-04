@@ -132,3 +132,45 @@ def get_team_system_prompt(base_prompt: str, team_name: str = None) -> str:
         print(f"⚠️  팀 지식 주입 실패 ({team_name}): {e}")
 
     return base_prompt
+
+
+def get_design_trends(days: int = 3) -> str:
+    """최근 N일치 디자인 트렌드 반환 (Awwwards SOTD 분석 결과).
+
+    Args:
+        days: 최근 몇 일치를 가져올지 (기본값 3)
+
+    Returns:
+        디자인 트렌드 마크다운 문서 문자열. 없으면 빈 문자열.
+
+    사용법:
+        from core.context_loader import get_design_trends
+
+        trends = get_design_trends(days=7)
+        if trends:
+            full_prompt = f"{system_prompt}\n\n{trends}"
+    """
+    from pathlib import Path
+
+    trends_dir = Path(__file__).parent.parent / "knowledge" / "base" / "design" / "trends"
+
+    if not trends_dir.exists():
+        return ""
+
+    # 최신 파일부터 역순 정렬
+    files = sorted(trends_dir.glob("*.md"), reverse=True)[:days]
+
+    if not files:
+        return ""
+
+    try:
+        content_parts = []
+        for f in files:
+            content = f.read_text(encoding='utf-8')
+            content_parts.append(content)
+
+        combined = "\n\n".join(content_parts)
+        return f"\n\n## 최근 디자인 트렌드 (Awwwards SOTD)\n\n{combined}"
+    except Exception as e:
+        print(f"⚠️  디자인 트렌드 로드 실패: {e}")
+        return ""
