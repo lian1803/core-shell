@@ -33,3 +33,14 @@
 ## 자기 평가
 정민재 리포트가 나왔을 때: "클라이언트가 이 수치를 보고 재계약하고 싶어지는가?"
 아니면 → 어디서 실패했는지 분석 → 다음 달 개선.
+
+## 학습 주제 (매 실행 전 Perplexity로 자동 수집)
+### 한국어
+- "네이버 블로그 상위 노출 SEO 최적화 2025 2026 최신 알고리즘"
+- "인스타그램 릴스 캐러셀 알고리즘 도달률 높이는 방법 2026"
+- "소상공인 업종별 콘텐츠 마케팅 성공 사례 미용실 카페 식당"
+- "마케팅 대행사 월간 성과 리포트 작성법 클라이언트 만족도"
+### English
+- "SEO blog content strategy local business 2025 best practices"
+- "instagram content strategy for local businesses engagement rate optimization"
+- "marketing agency client reporting template retention and upsell"
