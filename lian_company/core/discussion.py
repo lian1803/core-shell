@@ -27,7 +27,7 @@ def analyze_round(round_num: int, minsu_text: str, haeun_text: str, client: anth
     with client.messages.stream(
         model="claude-sonnet-4-6",
         max_tokens=500,
-        system=system,
+        system=inject_context(system),
         messages=[{"role": "user", "content": content}],
         temperature=0.3,
     ) as stream:
