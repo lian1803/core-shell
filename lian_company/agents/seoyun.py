@@ -1,6 +1,7 @@
 import os
 from openai import OpenAI
 from core.models import SONAR_PRO
+from core.context_loader import inject_context
 
 MODEL = SONAR_PRO
 
