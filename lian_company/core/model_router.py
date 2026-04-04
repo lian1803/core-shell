@@ -386,4 +386,4 @@ if __name__ == "__main__":
             }.get(cfg.provider, "[?????]")
             print(f"{provider_tag} {task.value:<25} -> {cfg.model}")
     print()
-    print("사용법: from core.model_router import route, call_routed")
+    print("Usage: from core.model_router import route, call_routed")
