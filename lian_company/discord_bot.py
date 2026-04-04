@@ -231,6 +231,7 @@ async def on_ready():
 @client.event
 async def on_message(message):
     """메시지 수신 및 처리"""
+    print(f"[DEBUG] 메시지 수신: '{message.content}' from {message.author} (id:{message.author.id})", flush=True)
 
     # 봇 자신 메시지 무시
     if message.author == client.user:
