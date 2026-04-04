@@ -41,6 +41,28 @@ CONDITIONAL = {
 }
 
 
+def _load_approvals() -> dict:
+    """리안이 승인한 카테고리 목록."""
+    if not os.path.exists(APPROVALS_PATH):
+        return {}
+    try:
+        with open(APPROVALS_PATH, encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        return {}
+
+
+def mark_approved(category: str):
+    """카테고리를 승인됨으로 기록."""
+    approvals = _load_approvals()
+    approvals[category] = {"approved_at": datetime.now().isoformat(), "count": approvals.get(category, {}).get("count", 0) + 1}
+    try:
+        with open(APPROVALS_PATH, "w", encoding="utf-8") as f:
+            json.dump(approvals, f, ensure_ascii=False, indent=2)
+    except Exception:
+        pass
+
+
 def should_escalate(task: dict, approval_count: int = 0) -> tuple[bool, str]:
     """에스컬레이션 여부 판단.
 
