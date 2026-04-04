@@ -279,7 +279,12 @@ class Autopilot:
 
     def _run_team_script(self, team_name: str) -> dict:
         """run_{팀명}.py 실행."""
-        script = os.path.join(_ROOT, f"run_{team_name}.py")
+        # 팀명 → 스크립트명 매핑 (예외 처리)
+        SCRIPT_MAP = {
+            "offline_marketing": "offline_sales.py",
+        }
+        script_name = SCRIPT_MAP.get(team_name, f"run_{team_name}.py")
+        script = os.path.join(_ROOT, script_name)
         if not os.path.exists(script):
             return {"success": False, "error": f"스크립트 없음: run_{team_name}.py", "result_summary": ""}
 
