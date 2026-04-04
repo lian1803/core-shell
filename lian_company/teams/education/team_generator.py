@@ -336,6 +336,15 @@ def _generate_mission(team_name: str, slug: str, team_dir: str, curriculum: dict
 ## 피벗 트리거
 3회 연속 KPI 미달 → 더 좁히거나 방향 바꿔라.
 범용화 금지. 좁힐수록 전문성이 생긴다.
+
+## 학습 주제 (매 실행 전 Perplexity로 자동 수집)
+### 한국어
+- "{purpose if purpose else team_name} 성공 사례 레퍼런스 2025 2026"
+- "{purpose if purpose else team_name} 전문가 노하우 실전 적용 방법"
+- "{purpose if purpose else team_name} 최신 트렌드 베스트 프랙티스"
+### English
+- "{purpose if purpose else team_name} best practices case study 2025 2026"
+- "{purpose if purpose else team_name} expert techniques real world application"
 """
     with open(mission_path, "w", encoding="utf-8") as f:
         f.write(mission_content)
