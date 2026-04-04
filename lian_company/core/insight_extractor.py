@@ -148,8 +148,7 @@ def _extract_analysis_sections(content: str) -> list[tuple[str, str]]:
     """보고사항들.md에서 분석 섹션 추출.
 
     여러 형식 지원:
-    1. 마크다운 테이블 형식 (현재 분석팀 미디어 분석)
-    2. 인스타 분석 섹션 (미래 형식 A/B)
+    1. 인스타 분석 섹션 (마크다운 형식)
 
     Returns:
         [(url, analysis_text), ...] 리스트
@@ -162,7 +161,7 @@ def _extract_analysis_sections(content: str) -> list[tuple[str, str]]:
     for match in re.finditer(pattern_header, content, re.MULTILINE | re.DOTALL):
         section_content = match.group(1)
 
-        # 섹션 내에서 URL 찾기
+        # 섹션 내에서 URL 찾기 (강제)
         url_pattern = r"\*\*URL\*\*:\s*(https://www\.instagram\.com/\S+)"
         url_match = re.search(url_pattern, section_content)
         if not url_match:
@@ -170,15 +169,34 @@ def _extract_analysis_sections(content: str) -> list[tuple[str, str]]:
 
         url = url_match.group(1)
 
-        # URL 이후의 분석 내용 추출 (분석** 섹션까지)
-        # "분석**:" 또는 "분석**" 다음부터 시작
-        analysis_pattern = r"(?:\*\*분석\*\*|\*\*분석|\*\*내용|\*\*결과)[\s:]*\n?(.*?)(?=\*\*|^##|\Z)"
-        analysis_match = re.search(analysis_pattern, section_content, re.DOTALL)
+        # "**분석**:" 다음부터 섹션 끝까지 추출
+        # (섹션 끝 = "---" 또는 다음 헤더)
+        analysis_start_idx = section_content.find("**분석**:")
+        if analysis_start_idx == -1:
+            # 다른 형식 시도
+            analysis_start_idx = section_content.find("**분석**")
+            if analysis_start_idx == -1:
+                continue
+            # "**분석**" 찾음 → 그 다음 내용부터
+            analysis_start_idx = section_content.find("\n", analysis_start_idx)
+            if analysis_start_idx == -1:
+                continue
+        else:
+            # "**분석**:" 찾음 → 콜론 다음부터
+            analysis_start_idx += len("**분석**:")
 
-        if analysis_match:
-            analysis = analysis_match.group(1).strip()
-            if analysis:  # 공백이 아니면
-                sections.append((url, analysis))
+        # 끝 지점: "---" 또는 파일 끝
+        remaining = section_content[analysis_start_idx:]
+        end_idx = remaining.find("---")
+        if end_idx == -1:
+            # "---" 없으면 끝까지
+            analysis = remaining
+        else:
+            analysis = remaining[:end_idx]
+
+        analysis = analysis.strip()
+        if analysis:  # 공백이 아니면 추가
+            sections.append((url, analysis))
 
     return sections
 
