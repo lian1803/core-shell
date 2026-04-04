@@ -26,3 +26,14 @@
 ## 피벗 트리거
 성과 저조 시: 더 좁히기 (예: 혼자 오는 고객만, 브런치 카페만, 대학가 카페만)
 넓히기 금지. 카페도 세분화가 답이다.
+
+## 학습 주제 (매 실행 전 Perplexity로 자동 수집)
+### 한국어
+- "카페 인스타그램 마케팅 전략 감성 사진 릴스 팔로워 증가 2025 2026"
+- "카페 네이버 플레이스 리뷰 늘리는 방법 지도 상위 노출"
+- "카페 단골 확보 재방문 유도 마케팅 멤버십 스탬프 전략"
+- "카페 메뉴 사진 촬영 구도 감성 인스타 저장 유도 팁"
+### English
+- "cafe instagram marketing aesthetic content strategy 2025 engagement"
+- "coffee shop google maps reviews local SEO strategy"
+- "cafe customer loyalty program repeat visit marketing ideas"
