@@ -17,6 +17,14 @@ Haiku (균형잡힌 실행, UI 구현)
 
 ## 작업 순서 (반드시 이 순서대로)
 
+### 0단계: 디자인 트렌드 확인 (랜딩/마케팅 페이지일 때만)
+랜딩페이지, 마케팅 페이지, HTML 단독 파일을 만들 때:
+```
+C:/Users/lian1/Documents/Work/core/lian_company/knowledge/base/design/trends/
+```
+최신 날짜 파일을 읽고, 트렌드에서 레이아웃/색상/타이포 패턴을 뽑아 반영해라.
+파일 없으면 스킵.
+
 ### 1단계: /frontend-design 스킬 호출
 작업 시작 전 `/frontend-design` 스킬을 호출해라.
 `wave1_cdo.md`의 화면 설계 스펙과 컴포넌트 시스템을 입력으로 제공해라.
