@@ -163,12 +163,17 @@ def run_pipeline(sieun_result: dict, autopilot: bool = False) -> None:
 
     # 토론 루프: 민수↔하은 (최대 2라운드)
     print(f"\n[4.5/9] 토론 루프...")
+    if HAS_STATUS_TRACKER:
+        update_status("토론", "이사팀", "running", "민수↔하은 토론 중")
     try:
         discussion = DiscussionRoom()
         context = discussion.run(context, client)
     except Exception as e:
         print(f"\n⚠️  토론 루프 에러 (건너뜀): {e}")
         context["discussion_transcript"] = []
+    finally:
+        if HAS_STATUS_TRACKER:
+            clear_status("토론")
     save_file(output_dir, "03b_토론_결과.md", "\n\n".join([
         f"## 라운드 {t['round']}\n{t['analysis']}\n\n[민수 수정]\n{t['minsu_revised']}\n\n[하은 최종]\n{t['haeun_final']}"
         for t in context.get("discussion_transcript", [])
