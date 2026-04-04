@@ -98,7 +98,7 @@ def save_report(url: str, analysis: str, caption: str):
     with open(report_path, "a", encoding="utf-8") as f:
         f.write(entry)
 
-    print(f"\n✅ 보고사항들.md에 저장됨")
+    print(f"\n[완료] 보고사항들.md에 저장됨")
 
 
 def main():
