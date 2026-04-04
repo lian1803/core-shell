@@ -4,9 +4,10 @@
 
 ### 대화 시작 시
 1. `OPERATIONS.md` 읽기 — 시스템 전체 매뉴얼 (뭘 할 수 있는지, 어떻게 하는지)
-2. `STATUS.md` 있으면 읽기 — 현재 상태 + 마지막 세션 작업 내용 (개인 파일, 없을 수 있음)
-3. `PROJECTS.md` 있으면 읽기 — 전체 프로젝트 목록 (개인 파일, 없을 수 있음)
-4. `lian_company/.pending_questions.json` 있으면 읽기 — 팀이 멈추고 리안한테 물어봐야 하는 것. answered: false 항목 있으면 **대화 첫 마디로 바로 질문해라.**
+2. `PROCESSES.md` 읽기 — **Core Processes (변경 불가 프로세스). 시스템 수정 전 반드시 확인.**
+3. `STATUS.md` 있으면 읽기 — 현재 상태 + 마지막 세션 작업 내용 (개인 파일, 없을 수 있음)
+4. `PROJECTS.md` 있으면 읽기 — 전체 프로젝트 목록 (개인 파일, 없을 수 있음)
+5. `lian_company/.pending_questions.json` 있으면 읽기 — 팀이 멈추고 리안한테 물어봐야 하는 것. answered: false 항목 있으면 **대화 첫 마디로 바로 질문해라.**
 
 ### 리안이 뭔가 시키면
 `OPERATIONS.md` 3번(의사결정 트리)를 보고 어떤 플로우를 태울지 스스로 판단해라.
