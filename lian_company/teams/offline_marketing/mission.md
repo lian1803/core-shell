@@ -60,3 +60,10 @@
 - "loss aversion sales technique small business owner persuasion real examples"
 - "sales funnel design for marketing agency cold to close without meeting"
 - "behavioral psychology in sales commitment consistency reciprocity practical application"
+
+## 자가점검 피드백 (2026-04-05) — 20/40점
+> 이전 실행에서 발견된 문제. 이번 실행에서 반드시 개선할 것.
+
+- 팀 미션에서 요구한 결과물은 6가지다: 1~6차 메시지 스크립트, 진단 보고서, 거절 대응 스크립트(4종 × 3버전), 영업 타이밍 캘린더, 전략, 카피. 지금 완성된 건 1차 메시지 3개와 전략 방향 문서뿐이다. 2차 메시지는 잘렸고, 3~6차는 없고, 진단 보고서는 없고, 거절 대응은 없고, 캘린더는 없다. validation 섹션이 "고쳐야 할 것"을 정확히 짚은 건 좋은데, 고친 결과물이 없다. 문제를 발견했으면 고쳐서 내야 한다.
+- **이슈 1 — 2~6차 메시지 없음**: 1차에서 답장 온 사장님한테 보낼 말
+

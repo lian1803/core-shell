@@ -28,25 +28,60 @@
 
 ## 4. 애니메이션 & 모션
 
-- 필수 3종: fadeUp(등장) + IntersectionObserver(스크롤) + 카운트업(숫자)
-- easing: cubic-bezier(0.16, 1, 0.3, 1) — ease-in-out 금지
-- 지연: stagger 0.07~0.1s 간격으로 순차 등장
-- 파티클/3D: Three.js — 정적 배경 절대 금지
-- 호버: transform translateY(-2~-4px) + box-shadow 변화
+- 필수 3종: fadeUp(등장) + ScrollTrigger(스크롤) + 카운트업(숫자)
+- GSAP 우선 — IntersectionObserver는 폴백용
+- easing: `power3.out` / `power4.out` — ease-in-out 금지
+- 지연: stagger 0.07~0.12s 순차 등장
+- 호버: translateY(-3px) + box-shadow glow 동시
 
-## 5. 인터랙션
+## 5. Three.js 파티클 — 표준 구현
 
-- 커스텀 커서: dot(6~8px) + lagging ring — mix-blend-mode: difference
-- 카드 hover: 마우스 위치 추적 radial-gradient glow
-- 버튼: before/after pseudo로 hover 효과 — border 변화만으론 부족
-- 링크: cursor: none (커스텀 커서 있을 때)
+**기본 구조 (항상 이걸 기준으로):**
+```js
+// 파티클 COUNT: 4000~6000
+// blending: THREE.AdditiveBlending (글로우 필수)
+// depthWrite: false
+// 구형 분포로 시작
+```
 
-## 6. 신뢰/퀄리티 체크
+**GLSL 버텍스 셰이더 필수 요소:**
+- `uTime` uniform — 웨이브 모션 `sin(t + pos.y * 2.0) * 0.08`
+- `uMouse` uniform — 마우스 리펄전 (커서 가까이 도망)
+- `uScroll` uniform — 스크롤에 반응하는 Y 드리프트
+- `aScale` attribute — 파티클마다 다른 크기
+- `aOffset` attribute — 각자 다른 위상 (동기화 금지)
+- `gl_PointSize = aScale * (380.0 / -mvPos.z)` — 원근감
 
-- 노이즈 텍스처 오버레이: SVG filter fractalNoise — 그레인감 필수
-- 마퀴 배너: 서비스명/키워드 흘려보내기 — 빈 공간 채우기
-- 스크롤 인디케이터: 히어로 하단 animated line
-- 푸터: border-top + 좌우 split 레이아웃
+**모핑 (고급):**
+- 3개 위치 배열 (aSpherePos / aTorusPos / aScatterPos)
+- `mod(uTime * 0.15, 3.0)`으로 사이클
+- `smoothstep` mix로 부드러운 전환
+
+**파티클 색상:**
+- 위치 기반 그라디언트 (vColor = mix(purple, blue, nx))
+- AdditiveBlending으로 겹치면 자연스럽게 밝아짐
+- alpha에 `sin(t + aOffset)` 적용 — 살아있는 느낌
+
+**배경 디테일:**
+- `THREE.TorusGeometry` 와이어링 2~3개 배경 배치
+- 투명도 0.05~0.1 — 배경 장식만
+
+## 6. 인터랙션
+
+- 커스텀 커서: dot(4~6px) + lagging ring(40px)
+  - `gsap.set(dot)` + `gsap.to(ring, {duration:.12})`
+  - hover 시 ring 60px + 보라 border
+- 마우스 → 카메라 시차: `camera.position.x += (mouseX*0.2 - camera.position.x)*0.04`
+- 파티클 마우스 리펄전: `smoothstep(0.8, 0.0, dist) * 0.6`
+- 버튼: gradient background + glow box-shadow on hover
+
+## 7. 신뢰/퀄리티 체크
+
+- 노이즈 텍스처: SVG fractalNoise `body::after` — opacity .2~.35
+- 마퀴: `animation: marquee 18s linear infinite` — 2배 복제해서 끊김 없이
+- 스크롤 인디케이터: scaleY 애니메이션 drip 효과
+- 섹션 구분: `border-top: 1px solid #080808` — 컬러 구분선 금지
+- 푸터: border-top + 좌우 split
 
 ## 7. SaaS 구조 기본값
 
