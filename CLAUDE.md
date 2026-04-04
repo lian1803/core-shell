@@ -181,8 +181,14 @@ LIANCP/
 │   │   ├── teams/               ← 팀별 결과물 + 피드백
 │   │   ├── inbox/               ← 리안이 넣는 캡쳐/영상 (분석팀이 처리)
 │   │   └── trends/              ← 자동 수집 트렌드 (❌ 미구현)
+│   ├── company_context.md        ← 회사 DNA (모든 에이전트 자동 주입) ✅
 │   ├── core/
-│   │   ├── pipeline.py          ✅
+│   │   ├── pipeline.py          ✅ (자동파일럿 모드 추가)
+│   │   ├── context_loader.py    ✅ (회사DNA 주입 유틸)
+│   │   ├── research_loop.py     ✅ (작업 전 Perplexity 자동 리서치)
+│   │   ├── launch_prep.py       ✅ (Layer 3: 런칭 준비)
+│   │   ├── ops_loop.py          ✅ (Layer 4: 운영 루프)
+│   │   ├── report_generator.py  ✅ (이사팀 보고서 생성)
 │   │   ├── output.py            ✅
 │   │   └── ui.py                ✅
 │   ├── archive/                 ← ✅ UltraProduct 프로젝트 설계 결과물 (절대 삭제 금지)
