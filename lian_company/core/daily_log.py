@@ -87,11 +87,19 @@ def get_last_run(project: str, task_type: str) -> dict | None:
 
 
 def get_approval_count(project: str, task_type: str) -> int:
-    """특정 프로젝트+타입의 성공 실행 횟수 (자율 전환 판단용)."""
+    """특정 카테고리의 성공 실행 횟수 (자율 전환 판단용).
+    project가 비어있으면 카테고리 전체 카운트."""
     recent = get_recent(days=90)
-    return sum(
-        1 for r in recent
-        if r.get("project") == project
-        and r.get("type") == task_type
-        and r.get("success")
-    )
+    count = 0
+    for r in recent:
+        if not r.get("success"):
+            continue
+        type_match = r.get("type") == task_type or r.get("category") == task_type
+        if not type_match:
+            continue
+        if project:
+            if r.get("project") == project:
+                count += 1
+        else:
+            count += 1
+    return count
