@@ -43,26 +43,57 @@ def get_caption(url: str) -> str:
     return result.stdout.strip() or "(캡션 없음)"
 
 
+def upload_video(client, video_path: Path):
+    """Gemini Files API로 영상 업로드"""
+    import time
+    print(f"   [영상 업로드] {video_path.name} ({video_path.stat().st_size // 1024 // 1024}MB)...")
+    uploaded = client.files.upload(file=video_path)
+    # 처리 완료 대기
+    while uploaded.state.name == "PROCESSING":
+        time.sleep(2)
+        uploaded = client.files.get(name=uploaded.name)
+    if uploaded.state.name == "FAILED":
+        raise RuntimeError(f"영상 업로드 실패: {uploaded.name}")
+    print(f"   [영상 완료] 업로드됨")
+    return uploaded
+
+
 def analyze_with_gemini(files: list[Path], caption: str, url: str) -> str:
-    """Gemini Vision으로 콘텐츠 분석"""
+    """Gemini Vision으로 콘텐츠 분석 (이미지 + 영상)"""
     client = genai.Client(api_key=os.getenv("GOOGLE_API_KEY"))
 
     image_files = [f for f in files if f.suffix.lower() in {".jpg", ".jpeg", ".png", ".webp"}]
+    video_files = [f for f in files if f.suffix.lower() in {".mp4", ".mov", ".avi", ".webm"}]
 
     parts = []
+
+    # 이미지
     for img_path in image_files[:10]:
         with open(img_path, "rb") as f:
             data = f.read()
         parts.append(genai.types.Part.from_bytes(data=data, mime_type="image/jpeg"))
 
-    prompt = f"""인스타그램 피드를 분석해줘.
+    # 영상 — Files API로 업로드
+    uploaded_files = []
+    for vid_path in video_files[:3]:
+        uploaded = upload_video(client, vid_path)
+        parts.append(genai.types.Part.from_uri(file_uri=uploaded.uri, mime_type=uploaded.mime_type))
+        uploaded_files.append(uploaded)
+
+    content_type = []
+    if image_files:
+        content_type.append(f"이미지 {len(image_files)}장")
+    if video_files:
+        content_type.append(f"영상 {len(video_files)}개")
+
+    prompt = f"""인스타그램 피드를 분석해줘. ({', '.join(content_type)})
 
 [캡션]
 {caption}
 
 [분석 항목]
 1. 이 계정은 뭘 하는 곳인가 (한 줄 요약)
-2. 콘텐츠 구성 방식 (슬라이드 흐름, 디자인 패턴, 폰트/색상 스타일)
+2. 콘텐츠 구성 방식 (슬라이드 흐름 / 영상 구성, 디자인 패턴, 폰트/색상 스타일)
 3. 카피라이팅 전략 (후킹 방식, 어투, 구조)
 4. 우리 사업에 적용할 포인트 (온라인 마케팅 대행 / 콘텐츠 납품 관점에서)
 5. 바로 훔쳐쓸 수 있는 것 (템플릿, 문구 구조, 포맷 등 구체적으로)
@@ -73,6 +104,14 @@ def analyze_with_gemini(files: list[Path], caption: str, url: str) -> str:
         model="gemini-2.5-flash",
         contents=[prompt] + parts
     )
+
+    # 업로드된 파일 정리
+    for uf in uploaded_files:
+        try:
+            client.files.delete(name=uf.name)
+        except Exception:
+            pass
+
     return response.text
 
 
