@@ -67,7 +67,7 @@ def minsu_revise(original_strategy: str, haeun_objections: str, round_analysis: 
     stream = openai_client.chat.completions.create(
         model="gpt-4o",
         messages=[
-            {"role": "system", "content": system},
+            {"role": "system", "content": inject_context(system)},
             {"role": "user", "content": content}
         ],
         stream=True,
