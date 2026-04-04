@@ -29,7 +29,7 @@ def get_client() -> anthropic.Anthropic:
     return anthropic.Anthropic(api_key=api_key)
 
 
-def run_pipeline(sieun_result: dict) -> None:
+def run_pipeline(sieun_result: dict, autopilot: bool = False) -> None:
     client = get_client()
     context = dict(sieun_result)
 
