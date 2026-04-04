@@ -73,6 +73,8 @@ def run(task: str = ""):
     output_dir = os.path.join(OUTPUT_BASE, "온라인마케팅팀")
 
     # 미션 + 학습 자동 로드 (에이전트한테 자동 전달)
+    enrich_context = None
+    self_critique_all = None
     try:
         sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
         from core.pipeline_utils import enrich_context, self_critique_all
