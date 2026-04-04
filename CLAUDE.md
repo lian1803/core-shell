@@ -2,6 +2,18 @@
 
 ## Claude 필수 규칙
 
+### 인스타그램 접속 시 (무조건)
+인스타그램 URL 분석 요청이 오면 → Playwright로 직접 브라우저 열지 말고 아래 스크립트로만 접속:
+```python
+# C:/Users/lian1/Documents/Work/core/lian_company/utils/insta_browse.py
+# 쿠키: C:/Users/lian1/Documents/Work/core/lian_company/instagram_cookies.txt (제니스 계정)
+```
+실행:
+```bash
+cd "C:/Users/lian1/Documents/Work/core/lian_company" && ./venv/Scripts/python.exe utils/insta_browse.py "인스타URL"
+```
+Playwright MCP로 instagram.com 직접 navigate 하면 무조건 로그인 팝업 뜸 — 절대 하지 마.
+
 ### 대화 시작 시
 1. `OPERATIONS.md` 읽기 — 시스템 전체 매뉴얼 (뭘 할 수 있는지, 어떻게 하는지)
 2. `PROCESSES.md` 읽기 — **Core Processes (변경 불가 프로세스). 시스템 수정 전 반드시 확인.**
