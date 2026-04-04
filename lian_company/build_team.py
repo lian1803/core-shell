@@ -16,6 +16,13 @@ from dotenv import load_dotenv
 load_dotenv()
 
 from teams.education.pipeline import run
+from utils.team_templates import (
+    list_templates,
+    get_similar_template,
+    import_team,
+    export_team,
+    print_templates,
+)
 
 BANNER = """
 ======================================================
