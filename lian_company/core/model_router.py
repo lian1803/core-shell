@@ -373,7 +373,7 @@ def _call_perplexity(cfg: ModelConfig, system: str, prompt: str) -> str:
 
 if __name__ == "__main__":
     print("=" * 65)
-    print("  리안 컴퍼니 — 모델 라우팅 테이블")
+    print("  [LIANCP] Model Routing Table")
     print("=" * 65)
     for task in TaskType:
         cfg = ROUTING_TABLE.get(task)
