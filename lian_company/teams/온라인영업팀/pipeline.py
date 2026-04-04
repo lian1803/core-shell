@@ -126,7 +126,6 @@ def run(task: str = ""):
 
     # 결과물을 지식으로 저장 + 리안 피드백 수집
     try:
-        import sys
         sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
         from knowledge.manager import save_team_result, collect_feedback
         for key, val in context.items():
