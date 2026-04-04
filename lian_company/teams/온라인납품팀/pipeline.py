@@ -10,6 +10,14 @@ from teams.온라인납품팀 import 윤하은
 from teams.온라인납품팀 import 정민재
 from teams.온라인납품팀 import 김태리
 
+# 자동 레퍼런스 수집
+try:
+    sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+    from core.pre_research import auto_research
+    HAS_PRE_RESEARCH = True
+except ImportError:
+    HAS_PRE_RESEARCH = False
+
 # 상태 추적
 try:
     sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
