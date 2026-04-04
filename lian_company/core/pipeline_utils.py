@@ -139,11 +139,27 @@ ISSUES: [이슈1] | [이슈2] | ...
     score_match = re.search(r'SCORE:\s*(\d+)/40', full_response)
     if score_match:
         score = int(score_match.group(1))
+    else:
+        # 폴백: "소계: XX/40" 패턴 합산 또는 개별 "X/10" 점수 합산
+        subtotals = re.findall(r'소계:\s*(\d+)/40', full_response)
+        if subtotals:
+            score = sum(int(s) for s in subtotals) // max(len(subtotals), 1)
+        else:
+            # X/10 점수들 합산
+            per10 = re.findall(r'\b(\d+)/10\b', full_response)
+            if per10:
+                score = min(40, sum(int(s) for s in per10[:8]))  # 최대 8개 기준
 
     issues = []
     issues_match = re.search(r'ISSUES:\s*(.+)', full_response)
     if issues_match:
         issues = [i.strip() for i in issues_match.group(1).split('|') if i.strip()]
+    # ISSUES 없으면 문제 키워드 줄에서 추출
+    if not issues:
+        problem_lines = [l.strip() for l in full_response.split('\n')
+                        if l.strip().startswith(('❌', '⚠️', '- 문제', '- 이슈'))
+                        and len(l.strip()) > 5]
+        issues = problem_lines[:5]
 
     passed = score >= 28  # 70% 이상이면 통과
 
