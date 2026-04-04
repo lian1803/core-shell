@@ -56,6 +56,8 @@ def scan_teams() -> list[dict]:
 
     teams = []
     for name in os.listdir(teams_dir):
+        if name.startswith("__") or name.startswith("."):
+            continue
         team_path = os.path.join(teams_dir, name)
         if not os.path.isdir(team_path):
             continue
