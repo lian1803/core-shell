@@ -45,46 +45,34 @@ def get_caption(url: str) -> str:
 
 def analyze_with_gemini(files: list[Path], caption: str, url: str) -> str:
     """Gemini Vision으로 콘텐츠 분석"""
-    genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
-    model = genai.GenerativeModel("gemini-2.0-flash")
+    client = genai.Client(api_key=os.getenv("GOOGLE_API_KEY"))
 
-    # 이미지 준비 (최대 10장)
-    parts = []
     image_files = [f for f in files if f.suffix.lower() in {".jpg", ".jpeg", ".png", ".webp"}]
 
+    parts = []
     for img_path in image_files[:10]:
         with open(img_path, "rb") as f:
             data = f.read()
-        parts.append({
-            "inline_data": {
-                "mime_type": "image/jpeg",
-                "data": base64.b64encode(data).decode()
-            }
-        })
+        parts.append(genai.types.Part.from_bytes(data=data, mime_type="image/jpeg"))
 
-    prompt = f"""
-인스타그램 피드를 분석해줘.
+    prompt = f"""인스타그램 피드를 분석해줘.
 
 [캡션]
 {caption}
 
 [분석 항목]
-1. **이 계정은 뭘 하는 곳인가** (한 줄 요약)
-2. **콘텐츠 구성 방식** (슬라이드 흐름, 디자인 패턴, 폰트/색상 스타일)
-3. **카피라이팅 전략** (후킹 방식, 어투, 구조)
-4. **우리 사업에 적용할 포인트** (온라인 마케팅 대행 / 콘텐츠 납품 관점에서)
-5. **바로 훔쳐쓸 수 있는 것** (템플릿, 문구 구조, 포맷 등 구체적으로)
+1. 이 계정은 뭘 하는 곳인가 (한 줄 요약)
+2. 콘텐츠 구성 방식 (슬라이드 흐름, 디자인 패턴, 폰트/색상 스타일)
+3. 카피라이팅 전략 (후킹 방식, 어투, 구조)
+4. 우리 사업에 적용할 포인트 (온라인 마케팅 대행 / 콘텐츠 납품 관점에서)
+5. 바로 훔쳐쓸 수 있는 것 (템플릿, 문구 구조, 포맷 등 구체적으로)
 
-분석은 실무자 관점으로, 짧고 날카롭게. 이론 설명 말고 바로 쓸 수 있는 인사이트 위주로.
-"""
+분석은 실무자 관점으로, 짧고 날카롭게. 이론 설명 말고 바로 쓸 수 있는 인사이트 위주로."""
 
-    if parts:
-        response = model.generate_content([prompt] + [
-            {"inline_data": p["inline_data"]} for p in parts
-        ])
-    else:
-        response = model.generate_content(prompt)
-
+    response = client.models.generate_content(
+        model="gemini-2.0-flash",
+        contents=[prompt] + parts
+    )
     return response.text
 
 
