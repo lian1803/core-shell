@@ -98,6 +98,18 @@
 
 ---
 
+### [BUG-008] ✅ 수정됨 — 교육팀 생성 파일명 괄호/슬래시 오류
+- **위치**: `teams/education/team_generator.py` line 215
+- **증상**: `FileNotFoundError: 하은 (프론트엔드/UX 설계자)_결과.md`
+- **원인**: 팀원 이름에 괄호·슬래시 포함된 채로 파일명 생성
+- **수정**: safe_name 변환 로직 추가 (괄호/슬래시 → 제거/언더스코어) ✅
+
+### [BUG-009] outreach 타입 태스크 — `'NoneType' object is not subscriptable`
+- **위치**: `core/autopilot.py` → `_execute_task()` → outreach 분기
+- **증상**: outreach 태스크가 매번 실패. `None`이 subscript 됨
+- **원인**: outreach 분기에서 `team` 변수가 None인데 `_run_team_script(team)` 호출
+- **해결 방향**: outreach 태스크에 `target_team` 명시적으로 설정하거나, team이 None이면 온라인영업팀 기본값으로
+
 ### [BUG-006] offline_sales.py — research 변수 미바인딩
 - **위치**: `offline_sales.py` 마지막 보고/저장 단계
 - **증상**: `cannot access local variable 'research' where it is not associated with a value`
