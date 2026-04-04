@@ -288,7 +288,7 @@ def big_picture_check(context: dict, client) -> str:
     with client.messages.stream(
         model=MODEL,
         max_tokens=600,
-        system=BIG_PICTURE_PROMPT,
+        system=inject_context(BIG_PICTURE_PROMPT),
         messages=[{"role": "user", "content": user_msg}],
         temperature=0.7,
     ) as stream:
