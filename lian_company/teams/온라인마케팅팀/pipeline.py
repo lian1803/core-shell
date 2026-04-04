@@ -96,34 +96,70 @@ def run(task: str = ""):
     save(output_dir, "00_팀인터뷰.md", interview)
 
     print("\n[1/6] 서진혁...")
-    result_서진혁 = 서진혁.run(context, client)
-    context["서진혁"] = result_서진혁
-    save(output_dir, "서진혁_결과.md", result_서진혁)
+    if HAS_STATUS_TRACKER:
+        update_status("서진혁", "온라인마케팅팀", "running", "리드 헌터 활동 중")
+    try:
+        result_서진혁 = 서진혁.run(context, client)
+        context["서진혁"] = result_서진혁
+        save(output_dir, "서진혁_결과.md", result_서진혁)
+    finally:
+        if HAS_STATUS_TRACKER:
+            clear_status("서진혁")
 
     print("\n[2/6] 한소율...")
-    result_한소율 = 한소율.run(context, client)
-    context["한소율"] = result_한소율
-    save(output_dir, "한소율_결과.md", result_한소율)
+    if HAS_STATUS_TRACKER:
+        update_status("한소율", "온라인마케팅팀", "running", "세일즈 매니저 활동 중")
+    try:
+        result_한소율 = 한소율.run(context, client)
+        context["한소율"] = result_한소율
+        save(output_dir, "한소율_결과.md", result_한소율)
+    finally:
+        if HAS_STATUS_TRACKER:
+            clear_status("한소율")
 
     print("\n[3/6] 윤채원...")
-    result_윤채원 = 윤채원.run(context, client)
-    context["윤채원"] = result_윤채원
-    save(output_dir, "윤채원_결과.md", result_윤채원)
+    if HAS_STATUS_TRACKER:
+        update_status("윤채원", "온라인마케팅팀", "running", "마케팅 전략 수립 중")
+    try:
+        result_윤채원 = 윤채원.run(context, client)
+        context["윤채원"] = result_윤채원
+        save(output_dir, "윤채원_결과.md", result_윤채원)
+    finally:
+        if HAS_STATUS_TRACKER:
+            clear_status("윤채원")
 
     print("\n[4/6] 박시우...")
-    result_박시우 = 박시우.run(context, client)
-    context["박시우"] = result_박시우
-    save(output_dir, "박시우_결과.md", result_박시우)
+    if HAS_STATUS_TRACKER:
+        update_status("박시우", "온라인마케팅팀", "running", "크리에이티브 제작 중")
+    try:
+        result_박시우 = 박시우.run(context, client)
+        context["박시우"] = result_박시우
+        save(output_dir, "박시우_결과.md", result_박시우)
+    finally:
+        if HAS_STATUS_TRACKER:
+            clear_status("박시우")
 
     print("\n[5/6] 이도현...")
-    result_이도현 = 이도현.run(context, client)
-    context["이도현"] = result_이도현
-    save(output_dir, "이도현_결과.md", result_이도현)
+    if HAS_STATUS_TRACKER:
+        update_status("이도현", "온라인마케팅팀", "running", "운영 관리 중")
+    try:
+        result_이도현 = 이도현.run(context, client)
+        context["이도현"] = result_이도현
+        save(output_dir, "이도현_결과.md", result_이도현)
+    finally:
+        if HAS_STATUS_TRACKER:
+            clear_status("이도현")
 
     print("\n[6/6] 강하린...")
-    result_강하린 = 강하린.run(context, client)
-    context["강하린"] = result_강하린
-    save(output_dir, "강하린_결과.md", result_강하린)
+    if HAS_STATUS_TRACKER:
+        update_status("강하린", "온라인마케팅팀", "running", "성과 분석 중")
+    try:
+        result_강하린 = 강하린.run(context, client)
+        context["강하린"] = result_강하린
+        save(output_dir, "강하린_결과.md", result_강하린)
+    finally:
+        if HAS_STATUS_TRACKER:
+            clear_status("강하린")
 
 
     # 자가점검
