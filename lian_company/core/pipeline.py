@@ -136,10 +136,18 @@ def run_pipeline(sieun_result: dict, autopilot: bool = False) -> None:
     notify_agent_complete("준혁 | 최종 판단", 5, 9)
     notify_verdict(junhyeok_result["verdict"], junhyeok_result["score"])
 
+    # ── 보고서 생성 + 저장 ────────────────────────────────────────
+    report = generate_board_report(context)
+    save_file(output_dir, "00_이사팀_보고서.md", report)
+    print_save_ok("00_이사팀_보고서.md")
+
+    # 보고사항들.md에도 저장
+    save_report_to_보고사항(report, project_name)
+
     # GO 판단이 아니면 종료 (FORCE_GO 환경변수로 강제 통과 가능)
     if junhyeok_result["verdict"] == "NO_GO" and not os.getenv("FORCE_GO"):
         print(f"\n\n❌ 준혁 판단: NO-GO (점수: {junhyeok_result['score']})")
-        print("실행팀 진행 안 함. 아이디어를 수정하거나 다른 방향을 시도해봐.")
+        print("실행팀 진행 안 함. 보고서는 보고사항들.md에 저장됨.")
         print(f"\n📁 결과 저장: {output_dir}")
         return
 
@@ -153,18 +161,29 @@ def run_pipeline(sieun_result: dict, autopilot: bool = False) -> None:
     print(f"\n\n{'='*60}")
     print(f"  이사팀 완료. 준혁 판단: {verdict_label}")
     print(f"  결과 확인: {output_dir}")
+    print(f"  📋 보고서: 보고사항들.md 확인")
     print(f"{'='*60}")
 
-    # CONDITIONAL_GO면 리안 컨펌 필요, GO면 자동 진행
-    if junhyeok_result["verdict"] == "CONDITIONAL_GO":
-        should_proceed = wait_confirm("조건부 GO — 실행팀 진행할까? [y/n]")
-        if not should_proceed:
-            print("\n알겠어. 결과는 저장돼 있어.")
-            print(f"📁 {output_dir}")
+    if autopilot:
+        # 자동파일럿: GO면 자동 진행, 나머지는 보고서만 남기고 멈춤
+        if junhyeok_result["verdict"] == "GO":
+            print(f"\n🚀 자동파일럿 GO — 팀 설계 자동 진행")
+        elif junhyeok_result["verdict"] == "CONDITIONAL_GO":
+            print(f"\n⏸️  자동파일럿 조건부 GO — 보고서 확인 후 리안 판단 필요")
+            print(f"   보고사항들.md 확인하고, 진행하려면:")
+            print(f'   python main.py "{context.get("idea", "")}"')
             return
-        print("\n실행팀 진행 승인됨.")
     else:
-        print(f"\n실행팀 자동 진행 (GO 판정)")
+        # 대화형: CONDITIONAL_GO면 리안 컨펌, GO면 자동
+        if junhyeok_result["verdict"] == "CONDITIONAL_GO":
+            should_proceed = wait_confirm("조건부 GO — 실행팀 진행할까? [y/n]")
+            if not should_proceed:
+                print("\n알겠어. 결과는 저장돼 있어.")
+                print(f"📁 {output_dir}")
+                return
+            print("\n실행팀 진행 승인됨.")
+        else:
+            print(f"\n실행팀 자동 진행 (GO 판정)")
 
     notify_execution_start()
 
