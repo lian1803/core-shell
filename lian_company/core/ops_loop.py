@@ -13,6 +13,7 @@ ops_loop.py — Layer 4: 운영 루프
 """
 import os
 import sys
+import requests
 import anthropic
 from datetime import datetime
 from dotenv import load_dotenv
@@ -22,6 +23,29 @@ from core.models import CLAUDE_SONNET
 from core.self_improve import post_run_review
 
 load_dotenv()
+
+
+def _send_discord(title: str, content: str):
+    """디스코드 웹훅으로 알림 전송."""
+    webhook_url = os.getenv("DISCORD_WEBHOOK_URL")
+    if not webhook_url:
+        return
+    try:
+        # 디스코드 메시지 2000자 제한 — 요약본만 전송
+        summary = content[:1500].strip()
+        if len(content) > 1500:
+            summary += "\n\n... (전체 내용은 보고사항들.md 확인)"
+        payload = {
+            "embeds": [{
+                "title": f"📋 {title}",
+                "description": summary,
+                "color": 0x5865F2,
+                "footer": {"text": datetime.now().strftime("%Y-%m-%d %H:%M")}
+            }]
+        }
+        requests.post(webhook_url, json=payload, timeout=10)
+    except Exception as e:
+        print(f"[디스코드 알림 실패] {e}")
 
 MODEL = CLAUDE_SONNET
 REPORT_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "보고사항들.md")
