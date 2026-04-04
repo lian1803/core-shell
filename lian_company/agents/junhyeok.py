@@ -110,26 +110,33 @@ def run(context: dict, client: anthropic.Anthropic) -> dict:
         full_response = error_msg
 
     # JSON 파싱
-    verdict = "CONDITIONAL_GO"
-    score = 7.0
+    verdict = "REVIEW_NEEDED"
+    score = 5.0
 
     json_match = re.search(r'\{[^{}]*"verdict"[^{}]*\}', full_response, re.DOTALL)
     if json_match:
         try:
             data = json.loads(json_match.group())
-            verdict = data.get("verdict", "CONDITIONAL_GO")
-            score = float(data.get("score", 7.0))
+            verdict = data.get("verdict", "REVIEW_NEEDED")
+            score = float(data.get("score", 5.0))
         except (json.JSONDecodeError, ValueError):
-            # JSON 파싱 실패 시 키워드 검색
-            if "NO_GO" in full_response.upper():
+            # JSON 파싱 실패 시 키워드 검색 (구체적 판단)
+            # NO-GO 관련 키워드 우선 검색
+            no_go_keywords = ["NO_GO", "NO-GO", "노고", "비추천", "실행금지"]
+            go_keywords = ["GO", "GO자"]
+
+            found_no_go = any(kw in full_response.upper() for kw in no_go_keywords)
+            found_go = any(kw in full_response.upper() for kw in go_keywords)
+
+            if found_no_go:
                 verdict = "NO_GO"
                 score = 3.0
-            elif "GO" in full_response.upper():
+            elif found_go and not found_no_go:
                 verdict = "GO"
                 score = 8.0
             else:
-                # 둘 다 못 찾으면 REVIEW_NEEDED (자동 GO 금지)
+                # 둘 다 불명확하면 REVIEW_NEEDED (자동 GO 절대 금지)
                 verdict = "REVIEW_NEEDED"
-                score = 0.0
+                score = 5.0
 
     return {"text": full_response, "verdict": verdict, "score": score}

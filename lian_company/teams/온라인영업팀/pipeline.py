@@ -1,4 +1,5 @@
 import os
+import sys
 import anthropic
 from dotenv import load_dotenv
 from teams.온라인영업팀 import 박탐정
@@ -26,7 +27,14 @@ def save(output_dir: str, filename: str, content: str):
 
 
 def team_interview(task: str, client: anthropic.Anthropic) -> str:
-    """팀 시작 전 리안한테 디테일 인터뷰."""
+    """팀 시작 전 리안한테 디테일 인터뷰. 자동화 모드에서는 스킵."""
+    # 자동화 모드 감지: sys.argv에 인자 있고 stdin이 tty가 아니면 스킵
+    is_interactive = sys.stdin.isatty() if hasattr(sys.stdin, 'isatty') else True
+
+    if not is_interactive:
+        # subprocess/autopilot에서 호출 → 인터뷰 스킵, 기본값 반환
+        return f"리안 답변:\n(자동화 모드 - 인터뷰 스킵)"
+
     print("\n" + "="*60)
     print("🎤 팀 인터뷰 | 리안한테 디테일 파악")
     print("="*60)

@@ -1,4 +1,5 @@
 import os
+import sys
 import json
 import anthropic
 from datetime import datetime
@@ -104,6 +105,12 @@ def _self_assess(client, state: dict, mission: str) -> dict:
 def run(industry: str = "소상공인 네이버 플레이스 마케팅 대행"):
     client = get_client()
     context = {"industry": industry}
+
+    # BUG-006: 변수 미바인딩 방지를 위해 사전 초기화
+    research = ""
+    strategy = ""
+    copy = ""
+    validation = ""
 
     print(f"\n{'='*60}")
     print(f"🏢 오프라인 마케팅 팀 자율 가동")
