@@ -17,6 +17,7 @@ from core.notifier import (
     wait_confirm,
 )
 from teams.education.pipeline import run as build_team
+from core.report_generator import generate_board_report, save_report_to_보고사항
 
 load_dotenv()
 
