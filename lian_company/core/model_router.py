@@ -169,6 +169,16 @@ ROUTING_TABLE: dict[TaskType, ModelConfig] = {
         "경쟁사 조사 — 최신 공개 정보 수집"
     ),
 
+    # ── 추론 특화 ────────────────────────────────────────────
+    TaskType.REASONING: ModelConfig(
+        O4_MINI, "openai", 4000, 1.0,
+        "복잡한 추론/수학/논리 — o4-mini가 추론 벤치마크 최상"
+    ),
+    TaskType.RESEARCH_REASONING: ModelConfig(
+        SONAR_REASONING, "perplexity", 3000, 0.3,
+        "실시간 검색 + 깊은 추론 — Sonar Reasoning Pro"
+    ),
+
     # ── 속도/비용 최적화 ──────────────────────────────────────
     TaskType.FAST_CHEAP: ModelConfig(
         GPT41_NANO, "openai", 500, 0.5,
