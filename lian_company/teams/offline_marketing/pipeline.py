@@ -27,6 +27,175 @@ def save(filename: str, content: str):
     print(f"\n💾 저장: {path}")
 
 
+def post_run_critique(output: dict, client: anthropic.Anthropic, max_iterations: int = 2) -> dict:
+    """
+    파이프라인 완료 후 아웃풋 자가점검 — 리안한테 보고 전에 팀이 스스로 잡아내기.
+
+    체크리스트:
+    1. 가격 심리 — 총액(6개월 합계)이 크게 노출되면 거절률 증가
+    2. 해결책 노출 — "이렇게 하세요" 류 표현 있으면 신뢰도 하락
+    3. 손실 가시화 — 월 손실금액이 투자금과 비교 안 되면 설득력 약함
+    4. CTA 명확도 — 마지막에 연락처/버튼 없으면 액션율 0
+    5. 개인화 — 업체명/지역이 없으면 스팸 분류 확률 증가
+    """
+    print("\n" + "="*60)
+    print("🔍 자가점검 루프 | 아웃풋 품질 자동 점검")
+    print("="*60)
+
+    copy = output.get("copy", "")
+    strategy = output.get("strategy", "")
+    industry = output.get("industry", "서비스 미정")
+
+    critique_result = {
+        "passed": False,
+        "iterations": 0,
+        "issues": [],
+        "improvements": [],
+        "final_copy": copy,
+        "final_strategy": strategy
+    }
+
+    current_copy = copy
+    current_strategy = strategy
+
+    for iteration in range(max_iterations):
+        critique_result["iterations"] = iteration + 1
+
+        critique_prompt = f"""너는 오프라인 마케팅팀의 자가점검 담당자야.
+
+=== 검토 대상 ===
+업종: {industry}
+
+**스크립트/카피:**
+{current_copy[:2000]}
+
+**전략:**
+{current_strategy[:1500]}
+
+=== 자가점검 5가지 기준 ===
+1. **가격 심리** — 총액(6개월 합계)이 크게 노출되면 거절률 증가
+   - 점검: 월액 기준으로 표현됐는가? 6개월 합계가 노출되었는가?
+
+2. **해결책 노출** — "이렇게 하세요" 류 표현 있으면 신뢰도 하락
+   - 점검: 해결책을 제시하는가? 아니면 문제만 질문으로 유도하는가?
+
+3. **손실 가시화** — 월 손실금액이 투자금(DM비, 시간)과 비교 안 되면 설득력 약함
+   - 점검: 월 손실액이 구체적으로 표현되었는가?
+
+4. **CTA 명확도** — 마지막에 연락처/카톡/전화 버튼 없으면 액션율 0
+   - 점검: 명확한 행동유도(CTA)가 마지막에 있는가?
+
+5. **개인화** — 업체명/지역이 없으면 스팸 분류 확률 증가
+   - 점검: 템플릿 방식은 아닌가? 개인화 가능한 구조인가?
+
+=== 반환 형식 (JSON) ===
+{{
+  "issues": [
+    {{"criterion": "기준명", "status": "문제있음/정상", "detail": "구체적 지적"}},
+    ...
+  ],
+  "has_issues": true/false,
+  "improvement_suggestions": [
+    "구체적 개선 방안 1",
+    "구체적 개선 방안 2",
+    "구체적 개선 방안 3"
+  ]
+}}
+
+JSON만 반환."""
+
+        try:
+            response = client.messages.create(
+                model="claude-opus-4-1",
+                max_tokens=1000,
+                messages=[{"role": "user", "content": critique_prompt}]
+            )
+            text = response.content[0].text.strip()
+
+            # JSON 파싱
+            if "```" in text:
+                text = text.split("```")[1].replace("json", "").strip()
+
+            critique_data = json.loads(text)
+        except Exception as e:
+            print(f"\n⚠️  자가점검 분석 실패 (iteration {iteration+1}): {e}")
+            critique_data = {"issues": [], "has_issues": False, "improvement_suggestions": []}
+
+        # 이슈 기록
+        issues = critique_data.get("issues", [])
+        has_issues = critique_data.get("has_issues", False)
+
+        if issues:
+            critique_result["issues"].extend(issues)
+
+        print(f"\n[자가점검 {iteration+1}/{max_iterations}]")
+        if has_issues:
+            print(f"⚠️  문제 발견: {len(issues)}개")
+            for issue in issues:
+                print(f"  - {issue.get('criterion', 'N/A')}: {issue.get('detail', 'N/A')}")
+        else:
+            print(f"✅ 체크 완료 — 이슈 없음")
+            critique_result["passed"] = True
+            break
+
+        # 개선 제안이 있으면 다음 iteration을 위해 기록
+        improvements = critique_data.get("improvement_suggestions", [])
+        if improvements:
+            critique_result["improvements"].extend(improvements)
+
+            # 마지막 iteration이 아니면 카피 재작성 시도
+            if iteration < max_iterations - 1:
+                print(f"\n🔄 개선안 적용 — 스크립트 재작성 중...")
+
+                revise_prompt = f"""너는 영업 카피라이터야.
+
+다음 개선 제안에 따라 기존 스크립트를 수정해줘.
+
+**개선 제안:**
+{json.dumps(improvements[:3], ensure_ascii=False, indent=2)}
+
+**기존 스크립트:**
+{current_copy[:1500]}
+
+**요구:**
+- 개선 제안을 명확히 반영
+- 기존 톤앤매너 유지
+- 구체적이고 실행 가능한 내용
+- 마크다운 포맷 유지
+
+수정된 스크립트만 반환."""
+
+                try:
+                    revise_response = client.messages.create(
+                        model="claude-sonnet-4-5",
+                        max_tokens=2000,
+                        messages=[{"role": "user", "content": revise_prompt}]
+                    )
+                    revised_copy = revise_response.content[0].text.strip()
+                    current_copy = revised_copy
+                    print(f"✓ 스크립트 수정 완료")
+                except Exception as e:
+                    print(f"⚠️  스크립트 수정 실패: {e}")
+        else:
+            print(f"✓ 더 이상의 개선 제안 없음")
+            critique_result["passed"] = True
+            break
+
+    # 최종 아웃풋 저장
+    critique_result["final_copy"] = current_copy
+    critique_result["final_strategy"] = current_strategy
+
+    print(f"\n{'='*60}")
+    print(f"자가점검 결과: 총 {critique_result['iterations']}회 | ", end="")
+    if critique_result["passed"]:
+        print("✅ 통과")
+    else:
+        print(f"⚠️  미해결 이슈 {len(critique_result['issues'])}개 (리안 확인 필요)")
+    print(f"{'='*60}")
+
+    return critique_result
+
+
 def _read_current_state() -> dict:
     """현재 팀 산출물 + 피드백 전부 읽어서 상태 파악."""
     state = {}
