@@ -99,9 +99,9 @@ async def scrape_awwwards():
                     # 전체 URL로 변환
                     if href.startswith("/"):
                         href = "https://www.awwwards.com" + href
-                    # 제목 추출
-                    title_elem = await elem.query_selector("h2, h3, .title, [class*='title']")
-                    title = (await title_elem.inner_text()).strip() if title_elem else f"Site {len(sites)+1}"
+                    # 제목: URL slug에서 추출 (/sites/my-site-name → My Site Name)
+                    slug = href.rstrip("/").split("/sites/")[-1].split("?")[0]
+                    title = slug.replace("-", " ").title() if slug else f"Site {len(sites)+1}"
                     sites.append({"title": title, "url": href})
                     print(f"  {len(sites)}. {title}")
                 except Exception:
