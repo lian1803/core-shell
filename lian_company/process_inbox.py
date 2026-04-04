@@ -281,6 +281,22 @@ def run():
             entries.append({"original": fname, "deleted": True, "reason": "내용 없음"})
             continue
 
+        # 인스타그램 URL 목록 파일 감지 → 배치 분석으로 라우팅
+        insta_urls = re.findall(r'https://www\.instagram\.com/\S+', content)
+        if len(insta_urls) >= 2:
+            print(f"  인스타그램 URL {len(insta_urls)}개 감지 → 배치 분석 시작")
+            from analyze_instagram import batch_analyze
+            batch_analyze(insta_urls)
+            os.remove(fpath)
+            entries.append({
+                "original": fname, "saved": True, "saved_as": "(보고사항들.md 직접 저장)",
+                "reason": f"인스타그램 {len(insta_urls)}개 URL 배치 분석 완료",
+                "tags": ["instagram", "분석"],
+                "useful_for": ["all"],
+                "report": f"인스타 {len(insta_urls)}개 분석 완료. 보고사항들.md 확인해."
+            })
+            continue
+
         result = analyze(content, fname)
 
         if result.get("useful"):
