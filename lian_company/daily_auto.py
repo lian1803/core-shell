@@ -40,6 +40,20 @@ def main():
     date_str = datetime.now().strftime("%Y-%m-%d %H:%M")
     results = []
 
+    # ── 0단계: 디자인 트렌드 수집 ──────────────
+    log("0단계: 디자인 트렌드 수집 (Awwwards)")
+    try:
+        import asyncio
+        if sys.platform == "win32":
+            asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy())
+        from tools.design_scraper import main as scrape_design
+        asyncio.run(scrape_design())
+        results.append("디자인 트렌드: 수집 완료")
+        log("디자인 트렌드 수집 완료")
+    except Exception as e:
+        results.append(f"디자인 트렌드: 실패 ({e})")
+        log(f"디자인 트렌드 수집 실패: {e}")
+
     # ── 1단계: 전 팀 학습 ──────────────────────
     log("1단계: 전 팀 학습")
     try:
