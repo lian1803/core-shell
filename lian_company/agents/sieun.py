@@ -145,7 +145,7 @@ def confirm_direction(idea: str, conversation: list, client: anthropic.Anthropic
     with client.messages.stream(
         model=MODEL,
         max_tokens=300,
-        system=DIRECTION_PROMPT,
+        system=inject_context(DIRECTION_PROMPT),
         messages=messages,
         temperature=0,
     ) as stream:
