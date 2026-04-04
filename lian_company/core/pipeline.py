@@ -1,4 +1,5 @@
 import os
+import sys
 import anthropic
 from concurrent.futures import ThreadPoolExecutor
 from dotenv import load_dotenv
@@ -19,6 +20,13 @@ from core.notifier import (
 from teams.education.pipeline import run as build_team
 from core.report_generator import generate_board_report, save_report_to_보고사항
 from core.self_improve import post_run_review
+
+# 상태 추적
+try:
+    from utils.status_tracker import update_status, clear_status
+    HAS_STATUS_TRACKER = True
+except ImportError:
+    HAS_STATUS_TRACKER = False
 
 load_dotenv()
 
