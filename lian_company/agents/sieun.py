@@ -356,7 +356,7 @@ def interview_for_team(context: dict, client: anthropic.Anthropic) -> str:
     with client.messages.stream(
         model=MODEL,
         max_tokens=300,
-        system="너는 시은이야. 리안 답변을 듣고 추가로 궁금한 게 있으면 1~2개만 짧게 물어봐. 충분하면 '알겠어, 팀 설계 들어갈게!'라고 해.",
+        system=inject_context("너는 시은이야. 리안 답변을 듣고 추가로 궁금한 게 있으면 1~2개만 짧게 물어봐. 충분하면 '알겠어, 팀 설계 들어갈게!'라고 해."),
         messages=[
             {"role": "user", "content": f"질문: {full_response}\n\n리안 답변: {answer}"}
         ],
