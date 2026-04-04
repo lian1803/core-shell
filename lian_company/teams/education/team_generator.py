@@ -103,6 +103,17 @@ def run(task: str = ""):
     except FileNotFoundError:
         context["mission"] = ""
 
+    # 학습 (Perplexity로 최신 자료 수집)
+    try:
+        import sys as _sys
+        _sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+        from core.continuous_learning import learn_before_run
+        fresh_knowledge = learn_before_run("{team_slug}")
+        if fresh_knowledge:
+            context["fresh_knowledge"] = fresh_knowledge
+    except Exception as e:
+        print(f"\\n⚠️ 학습 스킵: {{e}}")
+
     # 팀 인터뷰 (리안한테 디테일 파악)
     interview = team_interview(task, client)
     context["interview"] = interview
