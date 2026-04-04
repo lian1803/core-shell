@@ -132,6 +132,8 @@ def find_new_models(provider: str, available: list[str]) -> list[str]:
 
 def run_check(verbose: bool = True) -> dict:
     """전체 검증 실행. 결과 dict 반환."""
+    import io
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
     print("[model_updater] Fetching available models...")
 
     results = {}
