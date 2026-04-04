@@ -165,6 +165,14 @@ def _deploy_landing_page(context: dict, launch_plan: str):
                     f.write(existing + entry)
             except Exception:
                 pass
+            # QA 자동 실행
+            try:
+                from core.qa_loop import run_qa
+                import time
+                time.sleep(5)  # 배포 반영 대기
+                run_qa(url_str, project_name)
+            except Exception as e:
+                print(f"  ⚠️  QA 스킵: {e}")
         else:
             print(f"  ⚠️  배포 실패: {result.stderr[:200]}")
     except Exception as e:
