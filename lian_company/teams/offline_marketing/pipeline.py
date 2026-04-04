@@ -559,35 +559,38 @@ def _check_clarification_needed(analysis: dict, status: dict, results_log: list)
 
 
 def _ask_lian(reason: str, analysis: dict, status: dict):
-    """보고사항들.md에 질문 올리고 멈춤."""
-    try:
-        import sys
-        sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
-        from knowledge.manager import write_report
+    """
+    .pending_questions.json에 저장.
+    Claude Code가 대화 시작 시 이 파일 확인 → 리안에게 바로 질문.
+    """
+    questions_path = os.path.join(
+        os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))),
+        "lian_company", ".pending_questions.json"
+    )
 
-        actions_text = "\n".join([f"- {a}" for a in analysis.get("specific_actions", [])])
-        content = (
-            f"⏸️ **자동 개선 중단 — 리안 확인 필요**\n\n"
-            f"**이유**: {reason}\n\n"
-            f"**팀이 하려던 것**:\n"
-            f"- 약한 포인트: {analysis.get('weak_point', 'N/A')}\n"
-            f"- 개선 영역: {analysis.get('improvement_focus', 'N/A')}\n"
-            f"- 조치 계획:\n{actions_text}\n\n"
-            f"**현재 데이터**: {status.get('data_count', 0)}건\n\n"
-            f"**리안이 결정해야 할 것**:\n"
-            f"이 방향으로 계속 진행할까요? 아니면 다른 방향이 있으면 알려주세요.\n\n"
-            f"→ 진행: `python lian_company/input_results.py \"계속해\"` 입력\n"
-            f"→ 방향 수정: Claude에게 말해줘"
-        )
-        write_report("오프라인 마케팅팀", "체크포인트", content)
-    except Exception as e:
-        # write_report 실패해도 파일 직접 쓰기로 폴백
-        report_path = os.path.join(
-            os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))),
-            "보고사항들.md"
-        )
+    # 기존 질문 로드
+    pending = []
+    if os.path.exists(questions_path):
         try:
-            with open(report_path, "a", encoding="utf-8") as f:
-                f.write(f"\n\n---\n## ⏸️ 오프라인 마케팅팀 체크포인트\n\n**이유**: {reason}\n\n리안 확인 필요.\n")
+            with open(questions_path, encoding="utf-8") as f:
+                pending = json.load(f)
         except Exception:
-            pass
+            pending = []
+
+    # 새 질문 추가
+    pending.append({
+        "timestamp": datetime.now().isoformat(),
+        "team": "오프라인 마케팅팀",
+        "reason": reason,
+        "weak_point": analysis.get("weak_point", ""),
+        "improvement_focus": analysis.get("improvement_focus", ""),
+        "planned_actions": analysis.get("specific_actions", []),
+        "data_count": status.get("data_count", 0),
+        "answered": False
+    })
+
+    with open(questions_path, "w", encoding="utf-8") as f:
+        json.dump(pending, f, ensure_ascii=False, indent=2)
+
+    print(f"\n❓ 질문 저장됨 → lian_company/.pending_questions.json")
+    print(f"   Claude Code 열면 자동으로 물어볼 거야.")
