@@ -98,7 +98,7 @@ def haeun_final_check(revised_strategy: str, original_objections: str, idea: str
         model="gemini-2.5-flash",
         contents=prompt,
         config=types.GenerateContentConfig(
-            system_instruction=system,
+            system_instruction=inject_context(system),
             temperature=0
         )
     ):
