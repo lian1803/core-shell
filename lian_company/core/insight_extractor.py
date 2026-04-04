@@ -145,57 +145,61 @@ def save_insight(category: str, insight_text: str, source_url: str = ""):
 
 
 def _extract_analysis_sections(content: str) -> list[tuple[str, str]]:
-    """보고사항들.md에서 분석 섹션 추출.
+    """보고사항들.md에서 인스타 분석 섹션 파싱.
 
-    여러 형식 지원:
-    1. 인스타 분석 섹션 (마크다운 형식)
+    지원 형식:
+    - ## [인스타 분석] 제목 — 날짜
+    - ## 인스타 분석 N/M — 날짜
+
+    각 섹션은:
+    **URL**: (Instagram URL)
+    **내용**: (설명)
+    **분석**:
+    (분석 내용)
+    ---
 
     Returns:
-        [(url, analysis_text), ...] 리스트
+        [(url, analysis_text), ...] 리스트. 빈 리스트면 섹션 없음.
     """
     sections = []
 
-    # 패턴 1: "## [인스타 분석]" 또는 "## 인스타 분석" 형식
-    # URL과 분석 내용을 포함하는 섹션
+    # 헤더 패턴: "## [인스타 분석]" 또는 "## 인스타 분석" 변형
+    # re.DOTALL: . 이 개행 문자도 매칭 (섹션 여러 줄 캡처용)
     pattern_header = r"^## (?:\[)?인스타 분석(?:\])?[^\n]*\n(.*?)(?=^##|\Z)"
     for match in re.finditer(pattern_header, content, re.MULTILINE | re.DOTALL):
         section_content = match.group(1)
 
-        # 섹션 내에서 URL 찾기 (강제)
+        # 1단계: 섹션 내에서 URL 찾기
         url_pattern = r"\*\*URL\*\*:\s*(https://www\.instagram\.com/\S+)"
         url_match = re.search(url_pattern, section_content)
         if not url_match:
-            continue
+            continue  # URL 없으면 이 섹션 스킵
 
         url = url_match.group(1)
 
-        # "**분석**:" 다음부터 섹션 끝까지 추출
-        # (섹션 끝 = "---" 또는 다음 헤더)
+        # 2단계: "**분석**:" 또는 "**분석**" 찾기
         analysis_start_idx = section_content.find("**분석**:")
         if analysis_start_idx == -1:
-            # 다른 형식 시도
+            # "**분석**:" 형식이 아니라면 "**분석**" 만 찾기
             analysis_start_idx = section_content.find("**분석**")
             if analysis_start_idx == -1:
-                continue
-            # "**분석**" 찾음 → 그 다음 내용부터
+                continue  # 분석 섹션 없음
+
+            # "**분석**" 다음 줄부터 시작
             analysis_start_idx = section_content.find("\n", analysis_start_idx)
             if analysis_start_idx == -1:
                 continue
         else:
-            # "**분석**:" 찾음 → 콜론 다음부터
+            # "**분석**:" 찾음 → 콜론 다음부터 시작
             analysis_start_idx += len("**분석**:")
 
-        # 끝 지점: "---" 또는 파일 끝
+        # 3단계: 분석 내용 끝 지점 찾기 ("---" 또는 파일 끝)
         remaining = section_content[analysis_start_idx:]
         end_idx = remaining.find("---")
-        if end_idx == -1:
-            # "---" 없으면 끝까지
-            analysis = remaining
-        else:
-            analysis = remaining[:end_idx]
+        analysis = remaining if end_idx == -1 else remaining[:end_idx]
 
         analysis = analysis.strip()
-        if analysis:  # 공백이 아니면 추가
+        if analysis:  # 공백 아닌 분석만 추가
             sections.append((url, analysis))
 
     return sections
