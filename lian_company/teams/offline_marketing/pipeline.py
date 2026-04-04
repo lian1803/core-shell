@@ -488,6 +488,7 @@ def improve():
         sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
         from knowledge.manager import write_report
 
+        actions_text = "".join([f"- {action}\n" for action in analysis.get("specific_actions", [])])
         report_content = (
             f"**데이터 기반 자동 개선** — {new_version}\n\n"
             f"- 수집 데이터: {status['data_count']}건\n"
@@ -495,8 +496,8 @@ def improve():
             f"- 개선 영역: {improvement_focus}\n"
             f"- 예상 효과: {analysis.get('expected_impact', 'N/A')}%\n\n"
             f"조치 내용:\n"
-            f"{''.join([f'- {action}\n' for action in analysis.get('specific_actions', [])])}\n"
-            f"\n저장 위치: `{results_dir}`"
+            f"{actions_text}\n"
+            f"저장 위치: `{results_dir}`"
         )
         write_report("오프라인 마케팅팀", "자율 개선", report_content)
     except Exception as e:
