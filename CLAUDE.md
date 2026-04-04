@@ -35,6 +35,22 @@
 단, 아래는 트리거 제외 (기존 프로젝트 이어하기):
 - "어제에 이어서" / "계속" / "이거 고쳐줘" / 기존 파일 수정 요청
 
+### 기존 팀 실행 트리거
+
+리안이 아래 패턴으로 말하면 → 해당 팀 바로 실행:
+- "영업팀 돌려줘" / "온라인영업 해줘" / "영업 스크립트 뽑아줘" + 태스크
+  → `cd lian_company && ./venv/Scripts/python.exe run_온라인영업팀.py "태스크"`
+- "납품팀 돌려줘" / "콘텐츠 뽑아줘" + 태스크
+  → `cd lian_company && ./venv/Scripts/python.exe run_온라인납품팀.py "태스크"`
+- "마케팅팀 돌려줘" + 태스크
+  → `cd lian_company && ./venv/Scripts/python.exe run_온라인마케팅팀.py "태스크"`
+- "오프라인 영업" / "오프라인 마케팅" + 태스크
+  → `cd lian_company && ./venv/Scripts/python.exe offline_sales.py "태스크"`
+- "일일 루프 돌려" / "오늘 콘텐츠 만들어" / "daily"
+  → `cd lian_company && ./venv/Scripts/python.exe daily_auto.py`
+
+리안이 태스크를 명시 안 하면 → "어떤 태스크로 돌릴까?" 한 줄만 물어봐라.
+
 ### 대화 종료 시
 
 1. **memory/ 업데이트** — 이번 대화에서 변경된 프로젝트 현황이나 결정사항 있으면 memory 파일 업데이트
