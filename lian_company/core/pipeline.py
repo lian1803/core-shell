@@ -271,6 +271,8 @@ def run_pipeline(sieun_result: dict, autopilot: bool = False) -> None:
     # ── 지훈: PRD 작성 ────────────────────────────────────────────
 
     print(f"\n[6/9] PRD 작성 (지훈)...")
+    if HAS_STATUS_TRACKER:
+        update_status("지훈", "이사팀", "running", "PRD 작성 중")
     try:
         prd_result = jihun.run(context, client)
         context["prd"] = prd_result
@@ -278,6 +280,9 @@ def run_pipeline(sieun_result: dict, autopilot: bool = False) -> None:
         print(f"\n⚠️  지훈 에러: {e}")
         prd_result = f"PRD 작성 실패: {e}"
         context["prd"] = prd_result
+    finally:
+        if HAS_STATUS_TRACKER:
+            clear_status("지훈")
     save_file(output_dir, "05_PRD_지훈.md", prd_result)
     print_save_ok("05_PRD_지훈.md")
     notify_agent_complete("지훈 | PRD 작성", 6, 9)
