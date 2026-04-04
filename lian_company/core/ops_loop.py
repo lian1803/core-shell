@@ -228,6 +228,75 @@ def weekly_loop(project_name: str, performance_data: str = ""):
     return full_response
 
 
+PIVOT_PROMPT = """너는 사업 전략가야.
+팀이 3회 이상 KPI를 달성하지 못했을 때 피벗 방향을 제안해.
+
+규칙:
+- "안 됐습니다" 보고 금지. 반드시 "이렇게 바꿀게요" 제안
+- 피벗 방향은 반드시 "더 좁히기" 위주 (범용화 절대 금지)
+- 예: 전체 소상공인 → 강남 미용실만, 스마트스토어 전체 → 패션 카테고리만
+- 피벗 후 기대 수치 반드시 포함
+
+출력:
+## 현재 문제 진단
+[KPI 미달 원인 3가지]
+
+## 피벗 방향 제안
+### 1순위: [더 좁힌 타겟/방향]
+- 왜: [이유]
+- 기대 효과: [수치]
+
+### 2순위: [다른 접근]
+- 왜: [이유]
+- 기대 효과: [수치]
+
+## 즉시 실행 액션 (이번 주 안에)
+1. [구체적 행동]
+2. [구체적 행동]
+"""
+
+
+def pivot_check(project_name: str, kpi_history: list = None, weeks_failing: int = 3) -> str:
+    """KPI 미달 감지 시 피벗 방향 자동 제안.
+
+    사용법:
+        pivot_check("오프라인 마케팅", weeks_failing=3)
+        pivot_check("온라인납품팀", kpi_history=["답장률 15%", "전환율 3%"])
+    """
+    client = _get_client()
+
+    print(f"\n{'='*60}")
+    print(f"🔄 피벗 체크 | {project_name} ({weeks_failing}주 연속 미달)")
+    print("="*60)
+
+    kpi_text = "\n".join(kpi_history) if kpi_history else "(KPI 데이터 없음 — 정성적 판단)"
+
+    user_msg = f"""프로젝트: {project_name}
+연속 미달 기간: {weeks_failing}주
+
+KPI 데이터:
+{kpi_text}
+
+피벗 방향 제안해줘."""
+
+    full_response = ""
+    with client.messages.stream(
+        model=MODEL,
+        max_tokens=1500,
+        system=inject_context(PIVOT_PROMPT),
+        messages=[{"role": "user", "content": user_msg}],
+        temperature=0.3,
+    ) as stream:
+        for text in stream.text_stream:
+            print(text, end="", flush=True)
+            full_response += text
+
+    print()
+    _save_to_report(f"피벗 제안 ({project_name})", full_response)
+    print(f"\n📋 보고사항들.md에 저장 완료")
+    return full_response
+
+
 # ── CLI ──────────────────────────────────────────────────────
 
 if __name__ == "__main__":
@@ -235,6 +304,7 @@ if __name__ == "__main__":
         print("사용법:")
         print('  python -m core.ops_loop daily "프로젝트명"')
         print('  python -m core.ops_loop weekly "프로젝트명" ["성과 데이터"]')
+        print('  python -m core.ops_loop pivot "프로젝트명" [미달주수]')
         sys.exit(1)
 
     mode = sys.argv[1]
@@ -245,5 +315,8 @@ if __name__ == "__main__":
     elif mode == "weekly":
         perf = sys.argv[3] if len(sys.argv) > 3 else ""
         weekly_loop(project, perf)
+    elif mode == "pivot":
+        weeks = int(sys.argv[3]) if len(sys.argv) > 3 else 3
+        pivot_check(project, weeks_failing=weeks)
     else:
-        print(f"알 수 없는 모드: {mode}. daily 또는 weekly 사용.")
+        print(f"알 수 없는 모드: {mode}. daily / weekly / pivot 사용.")
