@@ -18,6 +18,7 @@ from core.notifier import (
 )
 from teams.education.pipeline import run as build_team
 from core.report_generator import generate_board_report, save_report_to_보고사항
+from core.self_improve import post_run_review
 
 load_dotenv()
 
