@@ -9,8 +9,6 @@ CLAUDE_HAIKU     = "claude-haiku-4-5-20251001"  # 빠름·저렴·반복 작업
 # ── Google Gemini ──────────────────────────────────────────────
 GEMINI_FLASH     = "gemini-2.5-flash"        # 멀티모달·빠른 비전
 GEMINI_PRO       = "gemini-2.5-pro"          # 긴 문서·복잡 분석 (1M context)
-GEMINI_3_PRO     = "gemini-3-0-pro"          # 최신 Gemini (출시되면 교체)
-GEMINI_3_FLASH   = "gemini-3-0-flash"        # 최신 Gemini 빠른 버전
 
 # ── OpenAI ────────────────────────────────────────────────────
 GPT4O            = "gpt-4o"                  # 범용 GPT, 한국어 강점
