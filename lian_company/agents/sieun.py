@@ -425,7 +425,7 @@ Go/No-Go: {context.get('verdict', '')} (점수: {context.get('score', '')})
     with client.messages.stream(
         model=MODEL,
         max_tokens=500,
-        system=TEAM_DESIGN_PROMPT,
+        system=inject_context(TEAM_DESIGN_PROMPT),
         messages=[{"role": "user", "content": summary}],
         temperature=0,
     ) as stream:
