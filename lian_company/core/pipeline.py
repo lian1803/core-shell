@@ -182,11 +182,16 @@ def run_pipeline(sieun_result: dict, autopilot: bool = False) -> None:
 
     # 준혁: 최종 판단
     print(f"\n[5/9] 최종 판단...")
+    if HAS_STATUS_TRACKER:
+        update_status("준혁", "이사팀", "running", "최종 판단 중")
     try:
         junhyeok_result = junhyeok.run(context, client)
     except Exception as e:
         print(f"\n⚠️  준혁 에러: {e}")
         junhyeok_result = {"text": f"판단 실패: {e}", "verdict": "CONDITIONAL_GO", "score": 50}
+    finally:
+        if HAS_STATUS_TRACKER:
+            clear_status("준혁")
     context["junhyeok_text"] = junhyeok_result["text"]
     context["verdict"] = junhyeok_result["verdict"]
     context["score"] = junhyeok_result["score"]
