@@ -91,3 +91,44 @@ def reset_cache():
     """캐시 초기화 (company_context.md 수정 후 다시 읽을 때)."""
     global _CONTEXT_CACHE
     _CONTEXT_CACHE = None
+
+
+def get_team_system_prompt(base_prompt: str, team_name: str = None) -> str:
+    """팀 에이전트용 시스템 프롬프트 생성.
+
+    기존 SYSTEM_PROMPT에 팀 지식을 자동으로 주입합니다.
+
+    Args:
+        base_prompt: 에이전트의 기본 시스템 프롬프트 (SYSTEM_PROMPT)
+        team_name: 팀 이름 (예: "온라인납품팀")
+
+    Returns:
+        팀 지식이 포함된 전체 시스템 프롬프트
+
+    사용법:
+        from core.context_loader import get_team_system_prompt
+
+        def run(context: dict, client):
+            system_prompt = get_team_system_prompt(SYSTEM_PROMPT, "온라인납품팀")
+            client.messages.stream(
+                model=MODEL,
+                messages=[...],
+                system=system_prompt,
+            )
+    """
+    if not team_name:
+        return base_prompt
+
+    try:
+        from core.knowledge_injector import get_team_knowledge
+        knowledge = get_team_knowledge(team_name, max_tokens=1200)
+        if knowledge:
+            return f"""{base_prompt}
+
+=== 팀 학습 지식 (최신 분석 결과 기반) ===
+{knowledge}
+==="""
+    except Exception as e:
+        print(f"⚠️  팀 지식 주입 실패 ({team_name}): {e}")
+
+    return base_prompt
