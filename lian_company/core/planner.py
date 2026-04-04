@@ -14,6 +14,7 @@ from dotenv import load_dotenv
 from core.context_loader import inject_context
 from core.models import CLAUDE_SONNET
 from core.daily_log import get_recent, get_stats
+from core.kpi import get_kpi_summary_for_planner
 
 load_dotenv()
 
@@ -69,6 +70,10 @@ PLANNING_RULES = """
 ## 금지
 - 하루 API 비용 $10 초과 금지
 - 같은 태스크 하루 2회 이상 금지
+
+## KPI 기반 우선순위
+- 달성률 낮은 팀의 태스크를 우선순위 올림
+- 이번 달 목표 달성한 팀은 유지 모드로
 """
 
 PLANNER_PROMPT = f"""너는 리안 컴퍼니의 일일 작업 계획기야.
@@ -120,6 +125,12 @@ def plan_daily(assets: dict) -> list[dict]:
             for r in last_5
         )
 
+    # KPI 정보 추가
+    try:
+        kpi_summary = get_kpi_summary_for_planner()
+    except Exception:
+        kpi_summary = "(KPI 정보 로드 실패)"
+
     today = datetime.now().strftime("%Y-%m-%d (%A)")
     date_key = datetime.now().strftime("%Y%m%d")
 
@@ -138,6 +149,8 @@ def plan_daily(assets: dict) -> list[dict]:
 - 성공률: {stats['success_rate']*100:.0f}%
 - 타입별: {json.dumps(stats['by_type'], ensure_ascii=False)}
 - 프로젝트별: {json.dumps(stats['by_project'], ensure_ascii=False)}
+
+{kpi_summary}
 
 오늘 뭐 할지 정해줘. task id에는 {date_key}을 넣어."""
 
