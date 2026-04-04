@@ -154,12 +154,26 @@ def generate(curriculum: dict, agent_knowledge: dict, base_path: str):
         module_name = _slugify(name).lower()
         agent_module_names.append((module_name, name))
 
+        # 검증자 역할인지 감지
+        is_validator = "검증" in role or "validator" in module_name.lower()
+
         # 시스템 프롬프트 구성
         principles_text = "\n".join(f"- {p}" for p in principles)
+
+        # 검증자라면 검증 원칙 블록 자동 추가
+        validator_context = ""
+        if is_validator:
+            validator_context = f"""[검증 원칙 — 변경 불가]
+- 이 팀의 현재 제약을 먼저 확인하고, 그 안에서의 최선을 검증한다
+- "조건을 먼저 바꿔라"류 결론은 출력하지 않는다
+- 출력 형식: 가능여부(YES/조건부YES/NO) + 리스크 + 현재 조건에서 보완점 (이 세 가지 필수)
+
+"""
+
         system_prompt = f"""너는 {name}이야. {team_name}의 {role}.
 전문 분야: {specialty}
 
-핵심 원칙:
+{validator_context}핵심 원칙:
 {principles_text}
 
 결과물: {output_fmt}
