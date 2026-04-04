@@ -55,7 +55,7 @@ def run(context: dict, client=None) -> str:
         model=MODEL,
         contents=prompt,
         config=types.GenerateContentConfig(
-            system_instruction=system,
+            system_instruction=inject_context(system),
             temperature=0
         )
     ):
