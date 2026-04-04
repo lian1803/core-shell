@@ -241,10 +241,13 @@ def run_pipeline(sieun_result: dict, autopilot: bool = False) -> None:
     print(f"  팀 설계 시작")
     print(f"{'='*60}")
 
-    # 시은: 리안 워크플로우 인터뷰
-    print(f"\n[6/8] 리안 인터뷰 (실제 워크플로우 파악)...")
+    # 시은: 리안 워크플로우 인터뷰 (자동파일럿이면 추론, 대화형이면 직접 질문)
+    print(f"\n[6/8] 리안 인터뷰 ({'자동 추론' if autopilot else '실제 워크플로우 파악'})...")
     try:
-        interview = sieun.interview_for_team(context, client)
+        if autopilot:
+            interview = sieun.autopilot_interview(context, client)
+        else:
+            interview = sieun.interview_for_team(context, client)
         context["interview"] = interview
     except Exception as e:
         print(f"\n⚠️  인터뷰 에러: {e}")
