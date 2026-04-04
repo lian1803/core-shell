@@ -316,6 +316,7 @@ def run():
                 "saved_as": save_fname,
                 "reason": result.get("reason", ""),
                 "tags": result.get("tags", []),
+                "useful_for": result.get("useful_for", []),
                 "report": result.get("report_to_lian", ""),
             })
         else:
