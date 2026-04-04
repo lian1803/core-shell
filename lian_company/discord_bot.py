@@ -225,7 +225,7 @@ async def run_script(args: list) -> str:
 
 @client.event
 async def on_ready():
-    print(f"✅ 봇 로그인: {client.user}")
+    print(f"[OK] 봇 로그인: {client.user}", flush=True)
 
 
 @client.event
