@@ -85,7 +85,7 @@ def save_report(url: str, analysis: str, caption: str):
 
     entry = f"""
 ---
-## 📊 인스타 분석 — {timestamp}
+## [인스타 분석] 인스타 분석 — {timestamp}
 **URL**: {url}
 
 **원본 캡션**:
