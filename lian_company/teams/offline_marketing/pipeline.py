@@ -589,3 +589,5 @@ def _ask_lian(reason: str, analysis: dict, status: dict):
         try:
             with open(report_path, "a", encoding="utf-8") as f:
                 f.write(f"\n\n---\n## ⏸️ 오프라인 마케팅팀 체크포인트\n\n**이유**: {reason}\n\n리안 확인 필요.\n")
+        except Exception:
+            pass
