@@ -2,6 +2,7 @@ import os
 from google import genai
 from google.genai import types
 from core.models import GEMINI_FLASH
+from core.context_loader import inject_context
 
 MODEL = GEMINI_FLASH
 
