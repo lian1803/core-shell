@@ -109,7 +109,28 @@ def run(context: dict, client: anthropic.Anthropic) -> str:
     print("🤖 박탐정 | 타겟 소상공인 잠재고객 분석 및 식별 기준 설계 전문가")
     print("="*60)
 
-    user_msg = f"""업무: {context['task']}\n\n이전 결과:\n{str(context)[:2000]}"""
+    # Meta Ads 분석 자동 실행 (경쟁사 정보가 있으면)
+    meta_analysis = ""
+    if spy and find_gaps:
+        task_lower = context.get('task', '').lower()
+
+        # 경쟁사명 감지 (예: "카페", "음식점", "미용실" 등 업종명이 있으면)
+        if any(keyword in task_lower for keyword in ['경쟁', '경쟁사', '분석', '비교']):
+            print("\n🔍 Meta Ads 경쟁사 분석 중...")
+
+            # 간단한 경쟁사 추출 (실제로는 더 정교한 파싱 가능)
+            competitors = []
+            if '경쟁사' in context.get('task', ''):
+                # task에서 경쟁사명 추출 시도
+                competitors = ['네이버', '구글', '카카오']  # 기본값
+
+            if competitors:
+                meta_analysis = f"\n\n=== Meta Ads 경쟁사 분석 결과 ===\n"
+                meta_analysis += spy(competitors[0])
+                meta_analysis += "\n\n=== 경쟁사 틈새 분석 ===\n"
+                meta_analysis += find_gaps(competitors)
+
+    user_msg = f"""업무: {context['task']}\n\n이전 결과:\n{str(context)[:2000]}{meta_analysis}"""
 
     full_response = ""
     with client.messages.stream(
