@@ -212,7 +212,9 @@ def generate(curriculum: dict, agent_knowledge: dict, base_path: str):
         steps.append(f'    print("\\n[{i}/{len(agent_module_names)}] {name}...")')
         steps.append(f'    result_{mod} = {mod}.run(context, client)')
         steps.append(f'    context["{mod}"] = result_{mod}')
-        steps.append(f'    save(output_dir, "{name}_결과.md", result_{mod})')
+        # 파일명에서 괄호/슬래시 제거 (Windows 경로 호환)
+        safe_name = name.replace("(", "").replace(")", "").replace("/", "_").replace(" ", "_").strip("_")
+        steps.append(f'    save(output_dir, "{safe_name}_결과.md", result_{mod})')
         steps.append("")
 
     interview_prompt_str = INTERVIEW_PROMPT.format(team_name=team_name)

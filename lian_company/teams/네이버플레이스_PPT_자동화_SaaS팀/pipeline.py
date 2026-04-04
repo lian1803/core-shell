@@ -73,37 +73,37 @@ def run(task: str = ""):
     print("\n[1/7] 서진 (SaaS 아키텍트)...")
     result_서진_saas_아키텍트 = 서진_saas_아키텍트.run(context, client)
     context["서진_saas_아키텍트"] = result_서진_saas_아키텍트
-    save(output_dir, "서진 (SaaS 아키텍트)_결과.md", result_서진_saas_아키텍트)
+    save(output_dir, "서진_결과.md", result_서진_saas_아키텍트)
 
     print("\n[2/7] 하은 (프론트엔드/UX 설계자)...")
     result_하은_프론트엔드ux_설계자 = 하은_프론트엔드ux_설계자.run(context, client)
     context["하은_프론트엔드ux_설계자"] = result_하은_프론트엔드ux_설계자
-    save(output_dir, "하은 (프론트엔드/UX 설계자)_결과.md", result_하은_프론트엔드ux_설계자)
+    save(output_dir, "하은_결과.md", result_하은_프론트엔드ux_설계자)
 
     print("\n[3/7] 준혁 (결제/인증 시스템 전문가)...")
     result_준혁_결제인증_시스템_전문가 = 준혁_결제인증_시스템_전문가.run(context, client)
     context["준혁_결제인증_시스템_전문가"] = result_준혁_결제인증_시스템_전문가
-    save(output_dir, "준혁 (결제/인증 시스템 전문가)_결과.md", result_준혁_결제인증_시스템_전문가)
+    save(output_dir, "준혁_결과.md", result_준혁_결제인증_시스템_전문가)
 
     print("\n[4/7] 민지 (PPT 품질 최적화 전문가)...")
     result_민지_ppt_품질_최적화_전문가 = 민지_ppt_품질_최적화_전문가.run(context, client)
     context["민지_ppt_품질_최적화_전문가"] = result_민지_ppt_품질_최적화_전문가
-    save(output_dir, "민지 (PPT 품질 최적화 전문가)_결과.md", result_민지_ppt_품질_최적화_전문가)
+    save(output_dir, "민지_결과.md", result_민지_ppt_품질_최적화_전문가)
 
     print("\n[5/7] 태영 (초기 고객 확보/그로스 전문가)...")
     result_태영_초기_고객_확보그로스_전문가 = 태영_초기_고객_확보그로스_전문가.run(context, client)
     context["태영_초기_고객_확보그로스_전문가"] = result_태영_초기_고객_확보그로스_전문가
-    save(output_dir, "태영 (초기 고객 확보/그로스 전문가)_결과.md", result_태영_초기_고객_확보그로스_전문가)
+    save(output_dir, "태영_결과.md", result_태영_초기_고객_확보그로스_전문가)
 
     print("\n[6/7] 수빈 (데이터/수익 최적화 전문가)...")
     result_수빈_데이터수익_최적화_전문가 = 수빈_데이터수익_최적화_전문가.run(context, client)
     context["수빈_데이터수익_최적화_전문가"] = result_수빈_데이터수익_최적화_전문가
-    save(output_dir, "수빈 (데이터/수익 최적화 전문가)_결과.md", result_수빈_데이터수익_최적화_전문가)
+    save(output_dir, "수빈_결과.md", result_수빈_데이터수익_최적화_전문가)
 
     print("\n[7/7] 정우 (검증자/QA 총괄)...")
     result_정우_검증자qa_총괄 = 정우_검증자qa_총괄.run(context, client)
     context["정우_검증자qa_총괄"] = result_정우_검증자qa_총괄
-    save(output_dir, "정우 (검증자/QA 총괄)_결과.md", result_정우_검증자qa_총괄)
+    save(output_dir, "정우_결과.md", result_정우_검증자qa_총괄)
 
 
     # 결과물을 지식으로 저장 + 리안 피드백 수집
