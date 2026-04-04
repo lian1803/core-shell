@@ -6,6 +6,14 @@ from datetime import datetime
 from dotenv import load_dotenv
 from teams.offline_marketing import researcher, strategist, copywriter, validator
 
+# 상태 추적
+try:
+    sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+    from utils.status_tracker import update_status, clear_status
+    HAS_STATUS_TRACKER = True
+except ImportError:
+    HAS_STATUS_TRACKER = False
+
 load_dotenv()
 
 TEAM_DIR = os.path.dirname(os.path.abspath(__file__))
