@@ -419,6 +419,13 @@ def improve():
     print(f"📌 개선 필요 영역: {analysis.get('improvement_focus', 'full')}")
     print(f"📌 기대 효과: {analysis.get('expected_impact', '-')}%")
 
+    # ── 체크포인트: 리안 확인이 필요한 상황이면 멈추고 질문 ──
+    clarify = _check_clarification_needed(analysis, status, results_log)
+    if clarify:
+        _ask_lian(clarify, analysis, status)
+        print(f"\n⏸️  리안 확인 필요 → 보고사항들.md에 질문 올림. 답변 후 improve() 재실행.")
+        return
+
     # ── 개선 포커스 결정 ──
     improvement_focus = analysis.get("improvement_focus", "full")
     focus_text = f"데이터 기반 개선: {analysis.get('weak_point')}. 조치: {', '.join(analysis.get('specific_actions', [])[:2])}"
