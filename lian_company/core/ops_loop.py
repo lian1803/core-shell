@@ -324,6 +324,10 @@ KPI 데이터:
     print()
     _save_to_report(f"피벗 제안 ({project_name})", full_response)
     print(f"\n📋 보고사항들.md에 저장 완료")
+
+    # 디스코드 알림
+    _send_discord(f"피벗 제안 — {project_name}", full_response)
+
     return full_response
 
 
