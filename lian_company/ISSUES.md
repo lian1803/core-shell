@@ -98,6 +98,20 @@
 
 ---
 
+### [BUG-006] offline_sales.py — research 변수 미바인딩
+- **위치**: `offline_sales.py` 마지막 보고/저장 단계
+- **증상**: `cannot access local variable 'research' where it is not associated with a value`
+- **원인**: research 변수가 조건부로만 할당되는데 항상 참조됨
+- **심각도**: LOW (팀은 완주됨, 저장만 일부 실패)
+
+### [BUG-007] run_offline_marketing.py 없음 — 팀명 매핑 불일치
+- **위치**: `core/autopilot.py` → `_run_team_script()`
+- **증상**: autopilot에서 `offline_marketing` 팀 실행 시 `run_offline_marketing.py` 찾아서 실패
+- **원인**: 실제 스크립트는 `offline_sales.py`인데 규칙이 달랐음
+- **수정**: SCRIPT_MAP에 매핑 추가 완료 ✅
+
+---
+
 ## 신규 생성된 것들
 
 | 항목 | 경로 |
