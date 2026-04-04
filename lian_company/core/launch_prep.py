@@ -117,4 +117,55 @@ def run_launch_prep(context: dict, client: anthropic.Anthropic) -> str:
             full_response += text
 
     print()
+
+    # 랜딩페이지 자동 생성 + Cloudflare 배포
+    _deploy_landing_page(context, full_response)
+
     return full_response
+
+
+def _deploy_landing_page(context: dict, launch_plan: str):
+    """Stitch HTML 생성 후 Cloudflare Pages 자동 배포."""
+    import subprocess, re, shutil, tempfile
+
+    project_name = context.get("idea", "프로젝트")[:20].replace(" ", "-").replace("/", "-")
+    slug = re.sub(r"[^a-z0-9-]", "", project_name.lower().replace(" ", "-"))[:30] or "lian-project"
+    deploy_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
+                              "team", project_name)
+    os.makedirs(deploy_dir, exist_ok=True)
+
+    html_path = os.path.join(deploy_dir, "index.html")
+    if not os.path.exists(html_path):
+        print(f"\n  ⚠️  index.html 없음 — Stitch 생성 필요 (Claude Code에서 실행)")
+        return
+
+    # Cloudflare Pages 배포
+    print(f"\n  🌐 Cloudflare Pages 배포 중 ({slug})...")
+    try:
+        # 프로젝트 생성 시도 (이미 있으면 무시)
+        subprocess.run(
+            ["npx", "wrangler", "pages", "project", "create", slug, "--production-branch", "main"],
+            capture_output=True, cwd=deploy_dir
+        )
+        result = subprocess.run(
+            ["npx", "wrangler", "pages", "deploy", ".", "--project-name", slug, "--branch", "main"],
+            capture_output=True, text=True, cwd=deploy_dir, timeout=120
+        )
+        if "Deployment complete" in result.stdout or "pages.dev" in result.stdout:
+            url = re.search(r"https://[\w.-]+\.pages\.dev", result.stdout)
+            url_str = url.group(0) if url else f"https://{slug}.pages.dev"
+            print(f"  ✅ 배포 완료: {url_str}")
+            # 보고사항들.md에 URL 기록
+            report_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
+                                       "보고사항들.md")
+            try:
+                entry = f"\n\n## 랜딩페이지 배포 완료\n\n- 프로젝트: {project_name}\n- URL: {url_str}\n\n---\n"
+                existing = open(report_path, encoding="utf-8").read() if os.path.exists(report_path) else ""
+                with open(report_path, "w", encoding="utf-8") as f:
+                    f.write(existing + entry)
+            except Exception:
+                pass
+        else:
+            print(f"  ⚠️  배포 실패: {result.stderr[:200]}")
+    except Exception as e:
+        print(f"  ⚠️  배포 오류: {e}")
