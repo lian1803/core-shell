@@ -107,7 +107,7 @@ def main():
         sys.exit(1)
 
     url = sys.argv[1]
-    print(f"📥 다운로드 중: {url}")
+    print(f"[다운로드] 다운로드 중: {url}")
 
     with tempfile.TemporaryDirectory() as tmp:
         tmp_path = Path(tmp)
