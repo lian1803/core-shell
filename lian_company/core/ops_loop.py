@@ -19,6 +19,7 @@ from dotenv import load_dotenv
 from core.context_loader import inject_context
 from core.research_loop import research_before_task
 from core.models import CLAUDE_SONNET
+from core.self_improve import post_run_review
 
 load_dotenv()
 
