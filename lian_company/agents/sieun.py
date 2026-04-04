@@ -1,6 +1,7 @@
 import re
 import anthropic
 from core.models import CLAUDE_SONNET
+from core.context_loader import inject_context
 
 MODEL = CLAUDE_SONNET
 
