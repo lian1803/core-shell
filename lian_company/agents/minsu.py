@@ -1,6 +1,7 @@
 import os
 from openai import OpenAI
 from core.models import GPT4O
+from core.context_loader import inject_context
 
 MODEL = GPT4O
 
