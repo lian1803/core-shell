@@ -327,11 +327,44 @@ def run():
                 "report": result.get("report_to_lian", ""),
             })
 
+    # 라우팅: useful_for 기반으로 팀별 knowledge에도 저장
+    _route_knowledge(entries)
+
     write_report(entries)
 
     print(f"\n{'='*60}")
     print(f"완료. 보고사항들.md 업데이트됨.")
     print(f"{'='*60}\n")
+
+
+def _route_knowledge(entries: list):
+    """useful_for 기반으로 팀별 knowledge 폴더에 복사."""
+    TEAM_KNOWLEDGE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "knowledge", "teams")
+    os.makedirs(TEAM_KNOWLEDGE, exist_ok=True)
+
+    for entry in entries:
+        if not entry.get("saved"):
+            continue
+
+        useful_for = entry.get("useful_for", [])
+        if not useful_for or useful_for == ["all"]:
+            continue
+
+        saved_as = entry.get("saved_as", "")
+        source_path = os.path.join(KNOWLEDGE_BASE, saved_as)
+        if not os.path.exists(source_path):
+            continue
+
+        with open(source_path, encoding="utf-8") as f:
+            content = f.read()
+
+        for team in useful_for:
+            team_dir = os.path.join(TEAM_KNOWLEDGE, team.replace(" ", "_"))
+            os.makedirs(team_dir, exist_ok=True)
+            dest = os.path.join(team_dir, saved_as)
+            with open(dest, "w", encoding="utf-8") as f:
+                f.write(content)
+            print(f"  📨 라우팅: {saved_as} → {team}")
 
 
 if __name__ == "__main__":
