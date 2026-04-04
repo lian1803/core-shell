@@ -285,7 +285,14 @@ def run(industry: str = "소상공인 네이버 플레이스 마케팅 대행"):
     print(f"🏢 오프라인 마케팅 팀 자율 가동")
     print(f"{'='*60}")
 
-    # ── 0. 미션 로드 ──────────────────────────────────────────
+    # ── 0. 미션 + 학습 자동 로드 ──────────────────────────────
+    try:
+        sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+        from core.pipeline_utils import enrich_context, self_critique_all
+        context = enrich_context(context, team_slug="offline_marketing")
+    except Exception as e:
+        print(f"⚠️ 미션/학습 로드 실패: {e}")
+
     mission_path = os.path.join(TEAM_DIR, "mission.md")
     try:
         with open(mission_path, encoding="utf-8") as f:
