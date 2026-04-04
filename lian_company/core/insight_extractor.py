@@ -22,6 +22,10 @@ import re
 from pathlib import Path
 from datetime import datetime
 import json
+from dotenv import load_dotenv
+
+# .env 로드 (독립 실행 시에도 API 키 접근 가능)
+load_dotenv(Path(__file__).parent.parent / ".env")
 
 import google.genai as genai
 
