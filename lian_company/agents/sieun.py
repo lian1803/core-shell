@@ -90,7 +90,7 @@ def clarify(idea: str, client: anthropic.Anthropic) -> str:
     with client.messages.stream(
         model=MODEL,
         max_tokens=600,
-        system=SYSTEM_PROMPT,
+        system=inject_context(SYSTEM_PROMPT),
         messages=messages,
         temperature=0.7,
     ) as stream:
@@ -119,7 +119,7 @@ def ask_clarification(idea: str, prev_answer: str, question: str, client: anthro
     with client.messages.stream(
         model=MODEL,
         max_tokens=600,
-        system=SYSTEM_PROMPT,
+        system=inject_context(SYSTEM_PROMPT),
         messages=messages,
         temperature=0.7,
     ) as stream:
