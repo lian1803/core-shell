@@ -125,11 +125,16 @@ def run_pipeline(sieun_result: dict, autopilot: bool = False) -> None:
     if seoyun_clean:
         context_for_minsu["seoyun"] = seoyun_clean
     print(f"\n[3/9] 전략 수립...")
+    if HAS_STATUS_TRACKER:
+        update_status("민수", "이사팀", "running", "전략 수립 중")
     try:
         minsu_result = minsu.run(context_for_minsu, client)
     except Exception as e:
         print(f"\n⚠️  민수 에러 (건너뜀): {e}")
         minsu_result = f"전략 수립 실패: {e}"
+    finally:
+        if HAS_STATUS_TRACKER:
+            clear_status("민수")
     context["minsu"] = minsu_result
     save_file(output_dir, "02_전략_민수.md", minsu_result)
     print_save_ok("02_전략_민수.md")
