@@ -46,3 +46,17 @@
 - 실제 계약 결과 (성사/거절/이유) — 리안만 아는 정보
 - 예산/패키지 가격 변경
 - 새 타겟 지역/업종
+
+## 학습 주제 (매 실행 전 Perplexity로 자동 수집)
+### 한국어
+- "소상공인 마케팅 대행 영업 성공 사례 2025 2026 실제 계약 성사 방법"
+- "카카오톡 비대면 영업 클로징 기법 B2SMB 전환율 높이는 방법"
+- "네이버 플레이스 마케팅 대행 가격 프레이밍 심리학 앵커링"
+- "소상공인 거절 처리 스크립트 비싸다 직접하겠다 나중에 실전 대응"
+- "마케팅 대행사 진단 보고서 디자인 설득력 있는 PDF 구성"
+### English
+- "best B2B cold outreach DM scripts 2025 2026 highest reply rate examples"
+- "pricing psychology for service businesses anchoring framing techniques"
+- "loss aversion sales technique small business owner persuasion real examples"
+- "sales funnel design for marketing agency cold to close without meeting"
+- "behavioral psychology in sales commitment consistency reciprocity practical application"
