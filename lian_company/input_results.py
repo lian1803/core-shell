@@ -10,6 +10,11 @@
 
 import sys
 import os
+import io
+
+# Windows 콘솔 인코딩 수정
+if sys.platform == "win32":
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
 # 부모 디렉토리를 경로에 추가
 sys.path.insert(0, os.path.dirname(__file__))
